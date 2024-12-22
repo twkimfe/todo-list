@@ -1,0 +1,25 @@
+@font-face {
+  font-family: "NanumGothicCoding";
+  src: url("../../assets/fonts/NanumGothicCoding-Regular.ttf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  /* 폰트 */
+  --font-family-primary: "NanumGothicCoding", sans-serif;
+
+  /* 색상 */
+  --color-primary: #007bff;
+  --color-secondary: #6c757d;
+  --color-success: #28a745;
+  --color-danger: #dc3545;
+  --color-background: #f8f9fa;
+  --color-text: #212529;
+
+  /* 여백 */
+  --spacing-xs: 0.25 rem;
+  --spacing-sm: 0.5 rem;
+  --spacing-md: 1 rem;
+  --spacing-lg: 1.5 rem;
+}
