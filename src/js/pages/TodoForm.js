@@ -7,26 +7,24 @@ class TodoForm {
 
   initializeForm() {
     this.form.innerHTML = `
-    <div class='form-group>
-      <label for ='todo-name'>Title</label>
-      <input type='text' id='todo-name' required>
-    </div>
-
     <div class='form-group'>
-      <label for ='todo-content'>Content</label>
-      <textarea id='todo-content' required></textarea>
-    </div>
+      <label for ='todo-name'>할일</label>
+        <input type='text' id='todo-name' required>
 
-    <div class='form-group'>
-      <label for ='todo-status'>Status</label>
-      <select id = 'todo-status' required>
-        <option value='pending'>미진행</option>
-        <option value='in-progress'>진행중</option>
-        <option value='completed'>완료</option>
-      </select>
+      <label for ='todo-content'>상세</label>
+        <textarea id='todo-content'  placeholder="어떻게 하고 싶나요?" ></textarea>
+         
+      <label for ='todo-status'>진행 상황</label>
+        <select id = 'todo-status' required>
+          <option value='pending'>미진행</option>
+          <option value='in-progress'>진행중</option>
+          <option value='completed'>완료</option>
+        </select>
+    <div class='button-container'>
+      <button type='cancel'>취소</button>
+    <button type='submit'>추가</button>
     </div>
-    
-    <button type='submit'>Create Todo</button>
+  </div>
 `;
 
     this.form.addEventListener("submit", this.handleSubmit.bind(this));
