@@ -3,9 +3,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-body {
   font-family: var(--font-family-primary);
 }
 
@@ -16,16 +13,20 @@ body {
 }
 
 h1 {
-  padding-bottom: 20px;
+  padding: 20px;
+}
+
+h3 {
+  padding: 10px 0px 50px 40px;
 }
 
 #todo-form {
   width: 100%;
   max-width: 800px;
-  margin: var(--spacing-lg) auto;
+
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  justify-content: flex-end;
+  padding: 0px 30px 0px 0px;
 }
 
 #todo-form input {
@@ -49,8 +50,8 @@ h1 {
 }
 
 #todo-form button {
-  width: 100%;
-  margin: var(--spacing-lg);
+  width: 150px;
+  font-size: 20px;
   padding: 15px;
   background-color: var(--color-primary);
   color: white;

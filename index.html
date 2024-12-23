@@ -11,15 +11,11 @@
     <div class="container">
       <header>
         <h1>Todo List</h1>
+        <h3>Just DO it.</h3>
       </header>
 
       <form id="todo-form">
-        <input
-          type="text"
-          id="todo-input"
-          placeholder="오늘은 무슨 일을 할까요?"
-        />
-        <button type="submit">추가</button>
+        <button type="submit">Add ToDo</button>
       </form>
 
       <main>
@@ -27,6 +23,9 @@
       </main>
     </div>
 
+    <script src="./src/js/models/Todo.js"></script>
+    <script src="./src/js/services/TodoService.js"></script>
+    <script src="./src/js/pages/TodoForm.js"></script>
     <script src="./src/js/app.js"></script>
   </body>
 </html>
