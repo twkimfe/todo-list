@@ -20,10 +20,20 @@ const routes = {
   },
 };
 
-// 초기 렌더링
-routes["/"].render();
+// 클린업 로직
+const cleanup = {
+  "/new": () => {
+    TodoForm.unmount();
+  },
+};
 
 export const changeUrl = (requestedUrl) => {
+  // 현재 라우트 클린업
+  const currentPath = window.location.pathname;
+  if (cleanup[currentPath]) {
+    cleanup[currentPath]();
+  }
+
   // history.pushState로 url 변경
   history.pushState(null, null, requestedUrl);
 
