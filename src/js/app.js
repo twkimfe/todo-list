@@ -1,15 +1,14 @@
-import { TodoForm } from "./pages/TodoForm.js";
-import { TodoService } from "./services/TodoService.js";
-import { TodoList } from "./pages/TodoList.js";
+import TodoService from "./services/TodoService.js";
 import { Router } from "../../Router.js";
+import { TodoForm } from "./pages/TodoForm.js";
+import TodoList from "./pages/TodoList.js";
+import Home from "../Home.js";
+
+const $app = document.querySelector("app");
 
 const todoService = new TodoService();
 
 const routes = {
-  "/new": {
-    component: TodoForm,
-    props: { todoService },
-  },
   "/": {
     component: class MainView {
       constructor(props) {
@@ -36,6 +35,11 @@ const routes = {
       }
     },
     props: {},
+  },
+
+  "/new": {
+    component: TodoForm,
+    props: { todoService },
   },
 };
 

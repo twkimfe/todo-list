@@ -1,5 +1,5 @@
 // src/js/services/TodoService.js
-export class TodoService {
+class TodoService {
   constructor() {
     this.todos = [];
     this.loadFromLocalStorage();
@@ -71,3 +71,5 @@ export class TodoService {
     );
   }
 }
+
+export default TodoService;

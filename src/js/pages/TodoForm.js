@@ -1,4 +1,7 @@
-export class TodoForm {
+//./src/js/pages/TodoForm.js
+import TodoService from "../services/TodoService.js";
+
+class TodoForm {
   // todoService 객체를 class의 프로퍼티로 저장
   constructor({ todoService }) {
     this.todoService = todoService;
@@ -125,3 +128,5 @@ export class TodoForm {
     });
   }
 }
+
+export default new TodoForm({ todoService: new TodoService() });

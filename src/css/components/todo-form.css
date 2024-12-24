@@ -47,13 +47,13 @@
   margin-top: 30px;
 }
 
-#app #add-todo-btn {
+#app .addTodoBtn {
   display: flex;
   margin-right: 40px;
   margin-left: auto;
 }
 
-#add-todo-btn {
+.addTodoBtn {
   background-color: #007bff;
   color: white;
   padding: 0.6rem 1rem;

@@ -8,26 +8,15 @@
     <link rel="stylesheet" href="./src/css/style.css" />
     <link rel="stylesheet" href="./src/css/utils/variables.css" />
     <link rel="stylesheet" href="./src/css/components/todo-form.css" />
+    <base href="/" />
   </head>
   <body>
-    <div class="container">
-      <header>
-        <h1>Todo List</h1>
-        <h3>PLAN it, DO it.</h3>
-      </header>
-      <div id="app">
-        <!-- 중복 렌더링 이슈로 form태그 삭제 -->
-        <button id="add-todo-btn">ToDo 추가</button>
-        <hr class="divider" />
-        <main>
-          <ul id="todo-list"></ul>
-        </main>
-      </div>
-    </div>
+    <main class="App"></main>
 
+    <script type="module" src="./main.js"></script>
     <script type="module" src="./src/js/models/Todo.js"></script>
     <script type="module" src="./src/js/services/TodoService.js"></script>
     <script type="module" src="./src/js/pages/TodoForm.js"></script>
-    <script type="module" src="./src/js/app.js"></script>
+    <script type="module" src="./src/js/pages/TodoList.js"></script>
   </body>
 </html>
