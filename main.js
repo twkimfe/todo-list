@@ -33,7 +33,7 @@ export const changeUrl = (requestedUrl) => {
 window.addEventListener("click", (e) => {
   if (e.target.classList.contains("addTodoBtn")) {
     changeUrl("/new");
-  } else {
+  } else if (e.target.getAttribute("type") === "cancel") {
     changeUrl("/");
   }
 });
