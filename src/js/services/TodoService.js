@@ -1,74 +1,108 @@
 // src/js/services/TodoService.js
+import Todo from "../models/Todo.js";
+
 class TodoService {
   constructor() {
     this.todos = [];
     this.loadFromLocalStorage();
   }
 
-  loadFromLocalStorage() {
-    const savedTodos = localStorage.getItem("todos");
-    if (savedTodos) {
-      const parsedTodos = JSON.parse(savedTodos);
-      Todo.nextId = Math.max(...parsedTodos.map((todo) => todo.id)) + 1;
-      this.todos = parsedTodos;
+  async loadFromLocalStorage() {
+    try {
+      const savedTodos = localStorage.getItem("todos");
+      if (savedTodos) {
+        const parsedTodos = JSON.parse(savedTodos);
+        Todo.nextId = Math.max(...parsedTodos.map((todo) => todo.id)) + 1;
+        this.todos = parsedTodos;
+      }
+    } catch (error) {
+      console.error("로딩 실패:", error);
+      this.todos = [];
     }
   }
 
-  saveToLocalStorage() {
-    localStorage.setItem("todos", JSON.stringify(this.todos));
+  async saveToLocalStorage() {
+    try {
+      localStorage.setItem("todos", JSON.stringify(this.todos));
+    } catch (error) {
+      console.error("저장 실패:", error);
+      throw new Error("저장 실패");
+    }
   }
 
   _findTodoIndex(id) {
     return this.todos.findIndex((todo) => todo.id === id);
   }
 
-  createTodo(todoData) {
-    const newTodo = new Todo(todoData);
-    this.todos.push(newTodo);
-    this.saveToLocalStorage();
-    return newTodo;
+  async createTodo(todoData) {
+    try {
+      const newTodo = new Todo(todoData);
+      this.todos.push(newTodo);
+      this.saveToLocalStorage();
+      return newTodo;
+    } catch (error) {
+      console.error("생성 실패:", error);
+      throw error;
+    }
   }
 
-  getTodos() {
+  async getTodos() {
     return this.todos;
   }
 
-  updateTodo(id, updateData) {
-    const index = this._findTodoIndex(id);
-    if (index !== -1) {
+  async updateTodo(id, updateData) {
+    try {
+      const index = this._findTodoIndex(id);
+      if (index !== -1) return null;
+
       this.todos[index] = { ...this.todos[index], ...updateData };
-      this.saveToLocalStorage();
+      await this.saveToLocalStorage();
       return this.todos[index];
+    } catch (error) {
+      console.error("수정 실패:", error);
+      throw error;
     }
-    return null;
   }
 
-  deleteTodo(id) {
-    const index = this._findTodoIndex(id);
-    if (index !== -1) {
+  async deleteTodo(id) {
+    try {
+      const index = this._findTodoIndex(id);
+      if (index !== -1) return false;
+
       this.todos.splice(index, 1);
-      this.saveToLocalStorage();
+      await this.saveToLocalStorage();
       return true;
+    } catch (error) {
+      console.error("삭제 실패:", error);
+      throw error;
     }
-    return false;
   }
 
-  toggleTodo(id) {
-    const index = this._findTodoIndex(id);
-    if (index !== -1) {
-      this.todos[index].done = !this.todos[index].done;
-      this.saveToLocalStorage();
-      return this.todos[index];
+  async toggleTodo(id) {
+    try {
+      const index = this._findTodoIndex(id);
+      if (index !== -1) {
+        this.todos[index].done = !this.todos[index].done;
+        this.saveToLocalStorage();
+        return this.todos[index];
+      }
+    } catch (error) {
+      console.error("토글 실패:", error);
+      throw error;
     }
-    return null;
   }
 
-  deleteAllTodos() {
-    confirm(
-      "진짜 전부 삭제하시겠어요? 복구는 안됩니다!",
-      (this.todos = []),
-      Todo.resetId()
-    );
+  async deleteAllTodos() {
+    try {
+      confirm("진짜 전부 삭제하시겠어요? 복구는 안됩니다!");
+      this.todos = [];
+      Todo.resetId();
+      await this.saveToLocalStorage();
+      return true;
+    } catch (error) {
+      console.error("토글 실패:", error);
+      throw error;
+    }
   }
 }
 

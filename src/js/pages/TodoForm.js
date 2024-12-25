@@ -68,7 +68,7 @@ class TodoForm {
       <label for ='todo-name'>할일</label>
         <input type='text' id='todo-name' required>
 
-      <label for ='todo-content'>상세</label>
+      <label for ='todo-content'>내용</label>
         <textarea id='todo-content'  placeholder="어떻게 하고 싶나요?" ></textarea>
          
       <label for ='todo-status'>진행 상황</label>
@@ -107,6 +107,11 @@ class TodoForm {
     };
 
     try {
+      // 유효성 검사 추가
+      if (!todoData.name.trim()) {
+        throw new Error("할일은 필수 입력값입니다.");
+      }
+
       // TodoService에 위임, localStorage 직접 조작 제거
       // Create new todo and save to localStorage
       const newTodo = await this.todoService.createTodo(todoData);
@@ -117,6 +122,7 @@ class TodoForm {
       console.error("Error creating todo:", error);
       this.dispatchEvent("error", {
         message:
+          error.message ||
           "오류가 생겼습니다, 새로고침 해주세요. 작성 내용은 저장이 안됩니다. 죄송합니다!",
       });
     }

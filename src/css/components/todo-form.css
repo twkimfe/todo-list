@@ -19,7 +19,8 @@
 .form-group textarea {
   width: calc(100% - 40px);
   max-width: 600px;
-  margin-left: 20px;
+  margin-left: 25px;
+  margin-bottom: 20px;
   padding: 0.5rem;
   border: 1px solid #ddd;
   border-radius: 4px;
