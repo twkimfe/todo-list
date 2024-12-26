@@ -1,4 +1,50 @@
 /* src/css/components/todo-form.css */
+
+#todo-form {
+  width: 100%;
+  max-width: 800px;
+
+  display: flex;
+  justify-content: flex-end;
+  padding: 0px 30px 0px 0px;
+}
+
+#todo-form input {
+  flex: 0.9;
+  margin-bottom: var(--spacing-sm);
+  padding: 30px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: border-color 0.3s ease;
+}
+
+#todo-form input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+#todo-form input::placeholder {
+  color: #999;
+}
+
+#todo-form button {
+  width: 150px;
+  font-size: 20px;
+  padding: 15px;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#todo-form button:hover {
+  background-color: #0056b3; /* 더 진한 파란색 */
+}
+
 .form-group {
   max-width: 600px;
   margin: 0 auto; /* 중앙 정렬을 위한 좌우 auto 마진 추가 */
@@ -46,29 +92,6 @@
   display: flex;
   justify-content: space-between;
   margin-top: 30px;
-}
-
-#app .addTodoBtn {
-  display: flex;
-  margin-right: 40px;
-  margin-left: auto;
-}
-
-.addTodoBtn {
-  background-color: #007bff;
-  color: white;
-  padding: 0.6rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.divider {
-  border: none;
-  height: 0.5px;
-  background-color: silver;
-  margin: 30px 20px;
 }
 
 button[type="submit"] {

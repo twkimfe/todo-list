@@ -20,7 +20,7 @@ class Todo {
     // 새 Todo 인스턴스를 생성하는 생성자 메서드
     // 매개변수 name, content, status를 인스턴스 속성으로 설정
 
-    this.id = String(Todo.getNextId());
+    this.id = Todo.nextId;
     this.name = name;
     this.content = content;
     this.status = status;

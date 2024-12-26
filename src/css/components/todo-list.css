@@ -1,0 +1,110 @@
+p.empty-list {
+  color: silver;
+  max-width: 600px;
+  margin: 50px auto;
+  text-align: center;
+}
+
+ul.todo-list {
+  max-width: 745px;
+  margin: 15px 0 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 745px;
+}
+
+.todo-checkbox {
+  margin: 0 10px;
+}
+
+.todo-content {
+  max-width: 510px;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center; /* 수평 중앙 정렬 */
+}
+
+.todo-content > p {
+  text-align: center; /* 텍스트 중앙 정렬 */
+  margin: 0; /* 기본 마진 제거 */
+  padding: 10px 0; /* 위아래 여백 */
+  overflow-wrap: break-word; /* 단어 단위 줄바꿈 */
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /* 기본적으로 1줄 */
+  -webkit-box-orient: vertical;
+  overflow: hidden; /* 1줄을 넘어가는 텍스트는 숨김 */
+}
+
+/* 내용이 길 때는 여러 줄로 표시 */
+.todo-content > p:hover {
+  -webkit-line-clamp: unset; /* hover 시 모든 내용 표시 */
+  white-space: pre-wrap; /* 줄바꿈 허용 */
+  overflow: visible; /* 숨김 해제 */
+  max-height: none;
+}
+
+button {
+  padding: 8px 8px;
+  border: none;
+  font-size: 16px;
+  border-radius: 5px;
+}
+
+.edit-btn {
+  margin: 0 auto; /* 양옆 여백을 자동으로 설정 */
+  padding: 8px 8px;
+  white-space: nowrap; /* 버튼 텍스트가 줄바꿈되지 않도록 설정 */
+}
+
+.todo-actions {
+  display: flex;
+  align-items: center;
+  margin-left: auto; /* todo-actions를 오른쪽으로 밀어냄 */
+  gap: 0; /* 기존 gap 제거하고 개별 요소의 margin으로 조정 */
+}
+
+.delete-btn {
+  padding: 8px 12px;
+  background-color: grey;
+  color: white;
+  margin-left: 10px;
+}
+
+.todo-content > p {
+  font-size: 20px;
+  text-align: center; /* 텍스트 중앙 정렬 */
+}
+
+.todo-status {
+  min-width: 65px;
+  margin: 0 10px;
+  padding: 8px 8px;
+  border-radius: 5px;
+  text-align: center;
+  text-shadow: 1px 1px 1px #808080;
+}
+
+/* 상태별 클래스 추가 */
+.pending .todo-status {
+  background-color: lightgray;
+  color: white;
+}
+
+.in-progress .todo-status {
+  background-color: yellow;
+  color: white;
+}
+
+.completed .todo-status {
+  background-color: var(--color-success);
+  color: white;
+}

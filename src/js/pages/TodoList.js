@@ -98,14 +98,13 @@ class TodoList {
         </div>
 
         <div class="todo-content">
-          <h3>${todo.name}</h3>
-          <p>${todo.content}</p>
+          <p>${todo.name}</p>
+          </div>
+          
+          <div class="todo-actions">
           <span class="todo-status">${this.getStatusText(todo.status)}</span>
-        </div>
-
-        <div class="todo-actions">
           <button class="edit-btn">수정</button>
-          <button class="delete-btn">삭제</button>
+          <button class="delete-btn">X</button>
         </div>
       </li>`
      )
@@ -122,6 +121,10 @@ class TodoList {
       completed: "완료",
     };
     return statusMap[status] || status;
+  }
+
+  getStatusClass(status) {
+    return status;
   }
 
   render() {
