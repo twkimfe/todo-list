@@ -1,10 +1,10 @@
-import TodoService from "../services/TodoService.js";
+import todoService from "../services/TodoService.js";
 
 class TodoList {
   constructor() {
     this.todos = [];
     // 싱글톤 인스턴스 사용
-    this.todoService = TodoService;
+    this.todoService = todoService;
     this.container = null;
 
     // 이벤트 리스너 바인딩
@@ -15,6 +15,8 @@ class TodoList {
   }
 
   async mount(container) {
+    console.log("container:", container);
+    console.log("this.todoService:", this.todoService);
     this.container = container;
 
     // todoCreated 이벤트 리스너 추가
@@ -24,11 +26,14 @@ class TodoList {
     document.addEventListener("todoToggled", this.handleTodoToggled);
 
     await this.refreshTodos();
+    console.log("refreshTodos 완료");
   }
 
   async refreshTodos() {
     try {
+      console.log("TodoService 상태:", this.todoService);
       this.todos = await this.todoService.getTodos();
+      console.log("가져온 todos:", this.todos);
       this.render();
     } catch (error) {
       console.error("data 새로고침 실패:", error);

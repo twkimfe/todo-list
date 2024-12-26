@@ -17,7 +17,11 @@ export class Router {
     }
 
     const container = document.getElementById("app");
-    this.currentComponent = new route.component(route.props);
+    // component가 이미 인스턴스인 경우를 처리
+    this.currentComponent =
+      typeof route.component === "function"
+        ? new route.component(route.props)
+        : route.component;
     this.currentComponent.mount(container);
   }
 

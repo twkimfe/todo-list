@@ -6,15 +6,29 @@ class Home {
     this.container = null;
     this.todoForm = TodoForm;
     this.todoList = TodoList;
+    console.log("Home constructor - todoList:", this.todoList); // 추가
+    console.log("TodoList의 todoService 상태:", this.todoList.todoService);
+    console.log(
+      "TodoList의 todoService의 todos:",
+      this.todoList.todoService.todos
+    );
   }
 
   mount(container) {
+    console.log("Home mount 시작");
     this.container = container;
+    console.log("container 설정됨:", container);
+
     this.render();
+    console.log("render 완료");
+
     this.bindEvents();
+    console.log("이벤트 바인딩 완료");
 
     // TodoList 마운트
     const todoListContainer = this.container.querySelector("#todo-list");
+    console.log("todoListContainer:", todoListContainer); // 추가
+    console.log("this.todoList before mount:", this.todoList); // 추가
     this.todoList.mount(todoListContainer);
   }
 

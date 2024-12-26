@@ -6,8 +6,8 @@ const $app = document.querySelector(".App");
 const routes = {
   "/": {
     render: () => {
-      $app.innerHTML = Home.template();
-      // Home은 template() 사용
+      // template 대신 mount 호출
+      Home.mount($app);
     },
   },
   "/new": {
