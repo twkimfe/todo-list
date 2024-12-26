@@ -14,8 +14,18 @@ class Home {
     this.bindEvents();
 
     // TodoList 마운트
-    const todoListContainer = this.container.queryselector("#todo-list");
+    const todoListContainer = this.container.querySelector("#todo-list");
     this.todoList.mount(todoListContainer);
+  }
+
+  unmount() {
+    if (this.todoList) {
+      this.todoList.unmount();
+    }
+    if (this.todoForm) {
+      this.todoForm.unmount();
+    }
+    this.container = null;
   }
 
   template() {
@@ -35,27 +45,46 @@ class Home {
   `;
   }
   render() {
+    if (!this.container) return;
     this.container.innerHTML = this.template();
   }
 
   bindEvents() {
     // +btn click시 TodoForm 표시
-    const addButton = this.container.queryselector(".addTodoBtn");
-    addButton.addEventListener("click", () => {
-      const appContainer = this.container.queryselector("#app");
-      this.todoForm.mount(appContainer);
-    });
+    const addButton = this.container.querySelector(".addTodoBtn");
+    addButton.addEventListener("click", this.handleAddButtonClick.bind(this));
 
-    // TodoForm에서 todo 생성 완료시
-    this.container.addEventListener("todoCreated", (event) => {
+    // 이벤트 위임으로 이벤트 처리
+    this.container.addEventListener(
+      "todoCreated",
+      this.handleTodoCreated.bind(this)
+    );
+
+    this.container.addEventListener(
+      "navigationRequested",
+      this.handleNavigation.bind(this)
+    );
+  }
+
+  handleAddButtonClick() {
+    const appContainer = this.container.querySelector("#app");
+    this.todoForm.mount(appContainer);
+  }
+
+  handleTodoCreated(event) {
+    try {
       const { todo } = event.detail;
+      if (!todo) {
+        throw new Error("todo data 미구현");
+      }
       this.todoList.addTodo(todo);
-    });
+    } catch (error) {
+      console.error("추가 실패:", error);
+    }
+  }
 
-    // Navi 요청 시 (TodoForm 취소 등)
-    this.container.addEventListener("navigationRequested", () => {
-      this.todoForm.unmount();
-    });
+  handleNavigation() {
+    this.todoForm.unmount();
   }
 }
 

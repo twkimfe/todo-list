@@ -1,9 +1,12 @@
 //./src/js/pages/TodoForm.js
-import TodoService from "../services/TodoService.js";
+import todoService from "../services/TodoService.js";
 
 class TodoForm {
   // todoService 객체를 class의 프로퍼티로 저장
-  constructor({ todoService }) {
+  constructor() {
+    console.log("전달받은 todoService:", todoService); // todoService 객체 확인
+
+    // 싱글톤 인스턴스 사용
     this.todoService = todoService;
     this.formElement = null;
     this.event = {
@@ -106,18 +109,24 @@ class TodoForm {
       status: this.formElement.querySelector("#todo-status").value,
     };
 
+    console.log("Form에서 입력된 데이터:", todoData); // 입력 데이터 확인
+
     try {
       // 유효성 검사 추가
       if (!todoData.name.trim()) {
         throw new Error("할일은 필수 입력값입니다.");
       }
 
-      // TodoService에 위임, localStorage 직접 조작 제거
-      // Create new todo and save to localStorage
+      // 1. Todo 생성 및 저장
       const newTodo = await this.todoService.createTodo(todoData);
+      // 2. todoCreated 이벤트 발생
       this.dispatchEvent("todoCreated", { todo: newTodo });
+      // 3. 폼 초기화
       this.formElement.reset();
-      this.event.onCancel();
+      // 4. 즉시 홈으로 이동 (setTimeout 제거)
+      window.location.href = "/index.html"; // 직접 URL 변경
+      // 5. TodoForm 정리
+      this.unmount();
     } catch (error) {
       console.error("Error creating todo:", error);
       this.dispatchEvent("error", {
@@ -135,4 +144,4 @@ class TodoForm {
   }
 }
 
-export default new TodoForm({ todoService: new TodoService() });
+export default new TodoForm();

@@ -3,8 +3,21 @@ import Todo from "../models/Todo.js";
 
 class TodoService {
   constructor() {
+    // 인스턴스가 있으면 반환
+    if (TodoService.instance) {
+      return TodoService.instance;
+    }
+    TodoService.instance = this;
     this.todos = [];
     this.loadFromLocalStorage();
+  }
+
+  // 싱글톤 인스턴스 획득 메서드
+  static getInstance() {
+    if (!TodoService.instance) {
+      TodoService.instance = new TodoService();
+    }
+    return TodoService.instance;
   }
 
   async loadFromLocalStorage() {
@@ -39,6 +52,11 @@ class TodoService {
       const newTodo = new Todo(todoData);
       this.todos.push(newTodo);
       this.saveToLocalStorage();
+      console.log(
+        "localStorage에 저장된 데이터:",
+        JSON.parse(localStorage.getItem("todos"))
+      ); // localStorage 데이터 확인
+
       return newTodo;
     } catch (error) {
       console.error("생성 실패:", error);
@@ -53,7 +71,8 @@ class TodoService {
   async updateTodo(id, updateData) {
     try {
       const index = this._findTodoIndex(id);
-      if (index !== -1) return null;
+      // 찾지 못 할 때 null 반환
+      if (index === -1) return null;
 
       this.todos[index] = { ...this.todos[index], ...updateData };
       await this.saveToLocalStorage();
@@ -67,7 +86,7 @@ class TodoService {
   async deleteTodo(id) {
     try {
       const index = this._findTodoIndex(id);
-      if (index !== -1) return false;
+      if (index === -1) return false;
 
       this.todos.splice(index, 1);
       await this.saveToLocalStorage();
@@ -105,5 +124,6 @@ class TodoService {
     }
   }
 }
+const todoService = new TodoService();
 
-export default TodoService;
+export default todoService;

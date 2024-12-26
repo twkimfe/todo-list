@@ -3,19 +3,76 @@ import TodoService from "../services/TodoService.js";
 class TodoList {
   constructor() {
     this.todos = [];
-    this.todoService = new TodoService();
+    // 싱글톤 인스턴스 사용
+    this.todoService = TodoService;
     this.container = null;
+
+    // 이벤트 리스너 바인딩
+    this.handleTodoCreated = this.handleTodoCreated.bind(this);
+    this.handleTodoDeleted = this.handleTodoDeleted.bind(this);
+    this.handleTodoUpdated = this.handleTodoUpdated.bind(this);
+    this.handleTodoToggled = this.handleTodoToggled.bind(this);
   }
 
   async mount(container) {
     this.container = container;
-    // 초기 데이터 로드
+
+    // todoCreated 이벤트 리스너 추가
+    document.addEventListener("todoCreated", this.handleTodoCreated);
+    document.addEventListener("todoDeleted", this.handleTodoDeleted);
+    document.addEventListener("todoUpdated", this.handleTodoUpdated);
+    document.addEventListener("todoToggled", this.handleTodoToggled);
+
+    await this.refreshTodos();
+  }
+
+  async refreshTodos() {
     try {
       this.todos = await this.todoService.getTodos();
       this.render();
     } catch (error) {
-      console.error("로딩 실패:", error);
+      console.error("data 새로고침 실패:", error);
     }
+  }
+
+  // 새 todo 생성 이벤트 핸들러
+  async handleTodoCreated(event) {
+    console.log("todo 생성됨:", event.detail);
+    await this.refreshTodos();
+  }
+
+  async handleTodoDeleted(event) {
+    console.log("todo 삭제됨:", event.detail);
+    await this.refreshTodos();
+  }
+
+  async handleTodoUpdated(event) {
+    console.log("todo 수정됨:", event.detail);
+    await this.refreshTodos();
+  }
+
+  async handleTodoToggled(event) {
+    console.log("todo 상태 변경됨:", event.detail);
+    await this.refreshTodos();
+  }
+
+  // unmount시 이벤트 리스너 정리
+  unmount() {
+    document.removeEventListener("todoCreated", this.handleTodoCreated);
+    document.removeEventListener("todoDeleted", this.handleTodoDeleted);
+    document.removeEventListener("todoUpdated", this.handleTodoUpdated);
+    document.removeEventListener("todoToggled", this.handleTodoToggled);
+
+    this.container = null;
+  }
+
+  // TodoForm에서 발생된 event 대응하는 메서드
+  notifyTodoChange(eventName, detail) {
+    const event = new CustomEvent(eventName, {
+      detail,
+      bubbles: true,
+    });
+    document.dispatchEvent(event);
   }
 
   template() {
@@ -70,14 +127,14 @@ class TodoList {
   }
 
   bindEvents() {
-    this.container.querySeletorAll(".delete-btn").forEach((button) => {
+    this.container.querySelectorAll(".delete-btn").forEach((button) => {
       button.addEventListener("click", (e) => {
         const todoId = e.target.closest(".todo-item").dataset.id;
         this.deleteTodo(todoId);
       });
     });
 
-    this.container.querySeletorAll(".edit-btn").forEach((button) => {
+    this.container.querySelectorAll(".edit-btn").forEach((button) => {
       button.addEventListener("click", (e) => {
         const todoId = e.target.closest(".todo-item").dataset.id;
         this.editTodo(todoId);
@@ -85,14 +142,14 @@ class TodoList {
     });
 
     // 체크박스 이벤트
-    this.container.querySeletorAll(".toggle-checkbox").forEach((checkbox) => {
+    this.container.querySelectorAll(".toggle-checkbox").forEach((checkbox) => {
       checkbox.addEventListener("change", async (e) => {
         const todoId = e.target.closest(".todo-item").dataset.id;
-        const todo = this.todo.find((todo) => todo.id === todoId);
+        const todo = this.todos.find((todo) => todo.id === todoId);
 
         if (todo) {
           try {
-            await this.todoService.toggleTodo(this.todos);
+            await this.todoService.toggleTodo(todoId);
             // 전체 목록을 다시 불러서 최신 상태 유지
             this.todos = await this.todoService.getTodos();
             this.render();
@@ -106,10 +163,13 @@ class TodoList {
 
   async addTodo(todo) {
     try {
-      await this.todoService.saveTodos(this.todos);
-      // 최신 목록 불러오기
-      this.todos = await this.todoService.getTodos();
-      this.render();
+      const newTodo = await this.todoService.createTodo(todo);
+
+      if (newTodo) {
+        // 최신 목록 불러오기
+        this.todos = await this.todoService.getTodos();
+        this.render();
+      }
     } catch (error) {
       console.error("Todo 추가 실패:", error);
     }
@@ -129,7 +189,7 @@ class TodoList {
   }
 
   async editTodo(todoId) {
-    const todo = this.fine((todo) => todo.id === todoId);
+    const todo = this.todos.find((todo) => todo.id === todoId);
     if (todo) {
       // 수정 이벤트
       this.container.dispatchEvent(
