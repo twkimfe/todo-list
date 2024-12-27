@@ -15,7 +15,7 @@ class Home {
 
     // TodoList 마운트
     const todoListContainer = this.container.querySelector("#todo-list");
-    console.log("todoListContainer:", todoListContainer); // 추가
+
     this.todoList.mount(todoListContainer);
   }
 

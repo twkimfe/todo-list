@@ -4,8 +4,6 @@ import todoService from "../services/TodoService.js";
 class TodoForm {
   // todoService 객체를 class의 프로퍼티로 저장
   constructor() {
-    console.log("전달받은 todoService:", todoService); // todoService 객체 확인
-
     // 싱글톤 인스턴스 사용
     this.todoService = todoService;
     this.formElement = null;

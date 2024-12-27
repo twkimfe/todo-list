@@ -15,8 +15,6 @@ class TodoList {
   }
 
   async mount(container) {
-    console.log("container:", container);
-    console.log("this.todoService:", this.todoService);
     this.container = container;
 
     // todoCreated 이벤트 리스너 추가
@@ -26,12 +24,10 @@ class TodoList {
     document.addEventListener("todoToggled", this.handleTodoToggled);
 
     await this.refreshTodos();
-    console.log("refreshTodos 완료");
   }
 
   async refreshTodos() {
     try {
-      console.log("TodoService 상태:", this.todoService);
       this.todos = await this.todoService.getTodos();
       console.log("가져온 todos:", this.todos);
       this.render();

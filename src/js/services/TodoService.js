@@ -25,12 +25,29 @@ class TodoService {
       const savedTodos = localStorage.getItem("todos");
       if (savedTodos) {
         const parsedTodos = JSON.parse(savedTodos);
-        Todo.nextId = Math.max(...parsedTodos.map((todo) => todo.id)) + 1;
-        this.todos = parsedTodos;
+        // null id를 가진 todo 제거
+        this.todos = parsedTodos.filter((todo) => todo.id !== null);
+
+        // ID 재할당: 모든 todo의 id를 0부터 순차적으로 변경
+        this.todos = this.todos.map((todo, index) => ({
+          ...todo,
+          id: index,
+        }));
+
+        // 다음 ID 설정
+        Todo.nextId = this.todos.length;
+
+        // 변경된 ID로 localStorage 업데이트
+        await this.saveToLocalStorage();
+      } else {
+        // localStorage에 데이터가 없으면 초기화
+        this.todos = [];
+        Todo.resetId();
       }
     } catch (error) {
       console.error("로딩 실패:", error);
       this.todos = [];
+      Todo.resetId();
     }
   }
 
@@ -44,7 +61,9 @@ class TodoService {
   }
 
   _findTodoIndex(id) {
-    return this.todos.findIndex((todo) => todo.id === id);
+    // null 체크 추가
+    if (id === null) return -1;
+    return this.todos.findIndex((todo) => todo.id === +id);
   }
 
   async createTodo(todoData) {
