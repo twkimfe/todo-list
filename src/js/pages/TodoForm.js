@@ -1,6 +1,8 @@
 //./src/js/pages/TodoForm.js
 import todoService from "../services/TodoService.js";
 
+console.log("todoForm loaded");
+
 class TodoForm {
   // todoService 객체를 class의 프로퍼티로 저장
   constructor() {
@@ -8,14 +10,22 @@ class TodoForm {
     this.todoService = todoService;
     this.formElement = null;
     this.event = {
-      onCancel: () =>
-        this.dispatchEvent("navigationRequested", { path: "/index.html" }),
-      onSubmit: this.handleSubmit.bind(this),
+      onCancel: () => {
+        if (window.router) {
+          window.router.navigate("/");
+        }
+      },
+      onSubmit: (e) => {
+        console.log("Submit event occurred");
+        // submit 이벤트 발생 확인
+        this.handleSubmit(e);
+      },
       onStatusChange: this.handleStatusChange.bind(this),
     };
   }
 
   bindEvents() {
+    console.log("bindEvents called"); // 이벤트 바인딩 확인
     // form 제출 이벤트
     this.formElement.addEventListener("submit", this.event.onSubmit);
     // 취소 버튼 이벤트
@@ -48,10 +58,14 @@ class TodoForm {
     if (this.formElement) {
       this.unmount();
     }
+    console.log("TodoForm mounting to container:", container); // 디버깅용
+
     // 새 요소 생성 및 이벤트 바인딩
     this.formElement = this.createForm();
-    this.bindEvents();
     container.appendChild(this.formElement);
+    this.bindEvents(); // 이벤트는 DOM 추가 후 바인딩
+
+    console.log("TodoForm mount completed"); // 디버깅용
   }
 
   unmount() {
@@ -59,6 +73,7 @@ class TodoForm {
       this.unbindEvents();
       this.formElement.remove();
       this.formElement = null;
+      console.log("TodoForm unmounted"); // 디버깅용
     }
   }
 
@@ -89,6 +104,9 @@ class TodoForm {
 
   // 커스텀 이벤트 치러 동일
   dispatchEvent(eventName, detail = {}) {
+    // 이벤트가 이미 처리되었는지 확인하는 플래그 추가
+    if (this.isEventProcessed) return;
+
     const event = new CustomEvent(eventName, {
       detail,
       bubbles: true,
@@ -96,41 +114,70 @@ class TodoForm {
     });
 
     this.formElement.dispatchEvent(event);
+
+    // 이벤트 처리 완료 표시
+    this.isEventProcessed = true;
+
+    // 다음 이벤트를 위해 setTimeout으로 플래그 초기화
+    setTimeout(() => {
+      this.isEventProcessed = false;
+    }, 0);
   }
 
   async handleSubmit(event) {
+    console.log("handleSubmit started"); // submit 핸들러 시작
     event.preventDefault();
 
-    const todoData = {
-      name: this.formElement.querySelector("#todo-name").value,
-      content: this.formElement.querySelector("#todo-content").value,
-      status: this.formElement.querySelector("#todo-status").value,
-    };
-
-    console.log("Form에서 입력된 데이터:", todoData); // 입력 데이터 확인
+    // 폼 전체 비활성화
+    const submitButton = this.formElement.querySelector(
+      'button[type="submit"]'
+    );
+    const inputs = this.formElement.querySelectorAll(
+      "input, textarea, select, button"
+    );
 
     try {
+      submitButton.disabled = true; // 버튼 비활성화
+      // 모든 입력 요소 비활성화
+      inputs.forEach((input) => (input.disabled = true));
+
+      const todoData = {
+        name: this.formElement.querySelector("#todo-name").value,
+        content: this.formElement.querySelector("#todo-content").value,
+        status: this.formElement.querySelector("#todo-status").value,
+      };
+
       // 유효성 검사 추가
       if (!todoData.name.trim()) {
         throw new Error("할일은 필수 입력값입니다.");
       }
-
       // 1. Todo 생성 및 저장
       const newTodo = await this.todoService.createTodo(todoData);
-      // 2. todoCreated 이벤트 발생
-      this.dispatchEvent("todoCreated", { todo: newTodo });
-      // 3. 폼 초기화
-      this.formElement.reset();
-      // 4. 즉시 홈으로 이동 (setTimeout 제거)
-      window.location.href = "/index.html"; // 직접 URL 변경
-      // 5. TodoForm 정리
-      this.unmount();
+      // 이벤트 발생 직전에 로그 추가
+      console.log("[TodoForm] todoCreated 이벤트 발생 직전:", newTodo);
+
+      // 이벤트 객체 직접 생성
+      const todoCreatedEvent = new CustomEvent("todoCreated", {
+        detail: { todo: newTodo },
+        bubbles: true,
+        composed: true,
+      });
+
+      // dispatchEvent 메서드 대신 직접 이벤트 발생
+      this.formElement.dispatchEvent(todoCreatedEvent);
+
+      // 페이지 이동 전 추가 로그
+      console.log("[TodoForm] 페이지 이동 직전");
+      if (window.router) {
+        window.router.navigate("/");
+      }
     } catch (error) {
       console.error("Error creating todo:", error);
+      submitButton.disabled = false;
+      inputs.forEach((input) => (input.disabled = false));
+
       this.dispatchEvent("error", {
-        message:
-          error.message ||
-          "오류가 생겼습니다, 새로고침 해주세요. 작성 내용은 저장이 안됩니다. 죄송합니다!",
+        message: error.message || "오류가 생겼습니다, 죄송합니다!",
       });
     }
   }
@@ -142,4 +189,4 @@ class TodoForm {
   }
 }
 
-export default new TodoForm();
+export default TodoForm;

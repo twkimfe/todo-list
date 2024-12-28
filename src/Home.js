@@ -1,32 +1,69 @@
+// Home.js
 import TodoForm from "../src/js/pages/TodoForm.js";
 import TodoList from "../src/js/pages/TodoList.js";
+
+console.log("Home loaded");
 
 class Home {
   constructor() {
     this.container = null;
     this.todoForm = TodoForm;
     this.todoList = TodoList;
+    this.eventHandlers = new Map();
   }
 
   mount(container) {
-    this.container = container;
-    this.render();
-    this.bindEvents();
+    if (!container) {
+      throw new Error("Container element is required");
+    }
 
-    // TodoList 마운트
-    const todoListContainer = this.container.querySelector("#todo-list");
+    try {
+      this.cleanup(); // 이전 이벤트 리스너들 정리
+      this.container = container;
+      this.render();
 
-    this.todoList.mount(todoListContainer);
+      // TodoList 컴포넌트 초기화
+      const todoListContainer = this.container.querySelector("#todo-list");
+      if (todoListContainer) {
+        this.todoList.mount(todoListContainer);
+      }
+
+      this.bindEvents();
+    } catch (error) {
+      console.error("Error mounting Home component:", error);
+      throw error;
+    }
   }
 
   unmount() {
-    if (this.todoList) {
-      this.todoList.unmount();
+    try {
+      if (this.todoList) {
+        this.todoList.unmount();
+      }
+
+      this.cleanup();
+      this.container = null;
+    } catch (error) {
+      console.error("Error unmounting Home component:", error);
     }
-    if (this.todoForm) {
-      this.todoForm.unmount();
-    }
-    this.container = null;
+  }
+
+  cleanup() {
+    if (!this.container) return;
+
+    // Map에 저장된 모든 이벤트 리스너 제거
+    this.eventHandlers.forEach((handler, eventName) => {
+      const [element, event] = eventName.split(":");
+      if (element === "container") {
+        this.container.removeEventListener(event, handler);
+      } else {
+        const el = this.container.querySelector(element);
+        if (el) {
+          el.removeEventListener(event, handler);
+        }
+      }
+    });
+    this.eventHandlers.clear();
   }
 
   template() {
@@ -37,10 +74,10 @@ class Home {
           <h3>PLAN it, DO it.</h3>
         </header>
         <div id="app">
-          <button class="addTodoBtn">+</button>
+           <button class="addTodoBtn" aria-label="할 일 추가">+</button>
           <br>
         <div class ="buttons">
-          <button class='allDelete'>X</button>
+             <button class="allDelete" aria-label="전체 삭제">X</button>
         </div>
           <hr class="divider" />
           <ul id="todo-list"></ul>
@@ -54,36 +91,45 @@ class Home {
   }
 
   bindEvents() {
-    // +btn click시 TodoForm 표시
+    // 할 일 추가 버튼 이벤트
     const addButton = this.container.querySelector(".addTodoBtn");
-    addButton.addEventListener("click", this.handleAddButtonClick.bind(this));
+    if (addButton) {
+      const boundAddHandler = this.handleAddButtonClick.bind(this);
+      addButton.addEventListener("click", boundAddHandler);
+      this.eventHandlers.set(".addTodoBtn:click", boundAddHandler);
+    }
 
-    // 이벤트 위임으로 이벤트 처리
-    this.container.addEventListener(
-      "todoCreated",
-      this.handleTodoCreated.bind(this)
-    );
-
-    this.container.addEventListener(
-      "navigationRequested",
-      this.handleNavigation.bind(this)
-    );
+    // Todo 생성 이벤트
+    const boundTodoCreatedHandler = this.handleTodoCreated.bind(this);
+    this.container.addEventListener("todoCreated", boundTodoCreatedHandler);
+    this.eventHandlers.set("container:todoCreated", boundTodoCreatedHandler);
   }
 
   handleAddButtonClick() {
-    const appContainer = this.container.querySelector("#app");
-    this.todoForm.mount(appContainer);
+    console.log("Add button clicked"); // + 버튼 클릭 확인
+    if (!window.router) {
+      console.error("Router is not initialized");
+      return;
+    }
+    window.router.navigate("/new");
   }
 
   handleTodoCreated(event) {
+    console.log("[Home] todoCreated 이벤트 감지:", event.detail);
+
     try {
       const { todo } = event.detail;
-      if (!todo) {
-        throw new Error("todo data 미구현");
+      if (!todo || typeof todo !== "object") {
+        throw new Error("Invalid todo data");
       }
-      this.todoList.addTodo(todo);
+
+      event.stopPropagation();
+
+      if (this.todoList && typeof this.todoList.addTodo === "function") {
+        this.todoList.addTodo(todo);
+      }
     } catch (error) {
-      console.error("추가 실패:", error);
+      console.error("Todo 추가 실패:", error);
     }
   }
 
