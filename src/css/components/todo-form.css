@@ -1,51 +1,5 @@
 /* src/css/components/todo-form.css */
-
-#todo-form {
-  width: 100%;
-  max-width: 800px;
-
-  display: flex;
-  justify-content: flex-end;
-  padding: 0px 30px 0px 0px;
-}
-
-#todo-form input {
-  flex: 0.9;
-  margin-bottom: var(--spacing-sm);
-  padding: 30px;
-  font-size: 16px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  transition: border-color 0.3s ease;
-}
-
-#todo-form input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-#todo-form input::placeholder {
-  color: #999;
-}
-
-#todo-form button {
-  width: 150px;
-  font-size: 20px;
-  padding: 15px;
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-#todo-form button:hover {
-  background-color: #0056b3; /* 더 진한 파란색 */
-}
-
-.form-group {
+.form-page .form-group {
   max-width: 600px;
   margin: 0 auto; /* 중앙 정렬을 위한 좌우 auto 마진 추가 */
   font-size: 18px;
@@ -56,13 +10,13 @@
   padding: 15px 0;
 }
 
-.form-group label {
+.form-page .form-group label {
   margin: 10px 0 10px 20px;
   padding: 10px;
 }
 
-.form-group input,
-.form-group textarea {
+.form-page .form-group input,
+.form-page .form-group textarea {
   width: calc(100% - 40px);
   max-width: 600px;
   margin-left: 25px;
@@ -74,14 +28,14 @@
   font-size: 14px;
 }
 
-.form-group select {
+.form-page .form-group select {
   width: 80px;
   margin: 5px 0 0 30px;
   padding: 5px;
   font-size: 14px;
 }
 
-.form-group textarea {
+.form-page .form-group textarea {
   min-height: 100px;
   resize: vertical;
 }
