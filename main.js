@@ -31,8 +31,6 @@ const initializeApp = () => {
         window.router.currentComponent.unmount();
       }
     });
-
-    console.log("Application initialized successfully");
   } catch (error) {
     console.error("Failed to initialize application:", error);
     // 에러 발생 시 폴백 UI 표시

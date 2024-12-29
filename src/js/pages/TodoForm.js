@@ -1,8 +1,6 @@
 //./src/js/pages/TodoForm.js
 import todoService from "../services/TodoService.js";
 
-console.log("todoForm loaded");
-
 class TodoForm {
   // todoService 객체를 class의 프로퍼티로 저장
   constructor() {
@@ -16,8 +14,6 @@ class TodoForm {
         }
       },
       onSubmit: (e) => {
-        console.log("Submit event occurred");
-        // submit 이벤트 발생 확인
         this.handleSubmit(e);
       },
       onStatusChange: this.handleStatusChange.bind(this),
@@ -25,7 +21,6 @@ class TodoForm {
   }
 
   bindEvents() {
-    console.log("bindEvents called"); // 이벤트 바인딩 확인
     // form 제출 이벤트
     this.formElement.addEventListener("submit", this.event.onSubmit);
     // 취소 버튼 이벤트
@@ -58,14 +53,11 @@ class TodoForm {
     if (this.formElement) {
       this.unmount();
     }
-    console.log("TodoForm mounting to container:", container); // 디버깅용
 
     // 새 요소 생성 및 이벤트 바인딩
     this.formElement = this.createForm();
     container.appendChild(this.formElement);
     this.bindEvents(); // 이벤트는 DOM 추가 후 바인딩
-
-    console.log("TodoForm mount completed"); // 디버깅용
   }
 
   unmount() {
@@ -73,7 +65,6 @@ class TodoForm {
       this.unbindEvents();
       this.formElement.remove();
       this.formElement = null;
-      console.log("TodoForm unmounted"); // 디버깅용
     }
   }
 
@@ -125,7 +116,6 @@ class TodoForm {
   }
 
   async handleSubmit(event) {
-    console.log("handleSubmit started"); // submit 핸들러 시작
     event.preventDefault();
 
     // 폼 전체 비활성화
@@ -153,8 +143,6 @@ class TodoForm {
       }
       // 1. Todo 생성 및 저장
       const newTodo = await this.todoService.createTodo(todoData);
-      // 이벤트 발생 직전에 로그 추가
-      console.log("[TodoForm] todoCreated 이벤트 발생 직전:", newTodo);
 
       // 이벤트 객체 직접 생성
       const todoCreatedEvent = new CustomEvent("todoCreated", {
@@ -166,8 +154,6 @@ class TodoForm {
       // dispatchEvent 메서드 대신 직접 이벤트 발생
       this.formElement.dispatchEvent(todoCreatedEvent);
 
-      // 페이지 이동 전 추가 로그
-      console.log("[TodoForm] 페이지 이동 직전");
       if (window.router) {
         window.router.navigate("/");
       }

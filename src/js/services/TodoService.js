@@ -71,10 +71,6 @@ class TodoService {
       const newTodo = new Todo(todoData);
       this.todos.push(newTodo);
       this.saveToLocalStorage();
-      console.log(
-        "localStorage에 저장된 데이터:",
-        JSON.parse(localStorage.getItem("todos"))
-      ); // localStorage 데이터 확인
 
       return newTodo;
     } catch (error) {

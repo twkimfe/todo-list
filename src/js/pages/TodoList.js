@@ -100,7 +100,7 @@ class TodoList {
           <div class="todo-actions">
           <span class="todo-status">${this.getStatusText(todo.status)}</span>
           <button class="edit-btn">수정</button>
-          <button class="delete-btn">X</button>
+          <button class="delete-btn">-</button>
         </div>
       </li>`
      )
