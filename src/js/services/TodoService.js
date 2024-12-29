@@ -2,22 +2,27 @@
 import Todo from "../models/Todo.js";
 
 class TodoService {
+  // 싱글톤 인스턴스 저장용 static 변수
+  static #instance = null;
+
+  // 생성자
   constructor() {
-    // 인스턴스가 있으면 반환
-    if (TodoService.instance) {
-      return TodoService.instance;
+    // 이미 인스턴스가 있다면 기존 인스턴스 반환
+    if (TodoService.#instance) {
+      return TodoService.#instance;
     }
-    TodoService.instance = this;
+
     this.todos = [];
     this.loadFromLocalStorage();
+    TodoService.#instance = this;
   }
 
   // 싱글톤 인스턴스 획득 메서드
   static getInstance() {
-    if (!TodoService.instance) {
-      TodoService.instance = new TodoService();
+    if (!TodoService.#instance) {
+      TodoService.#instance = new TodoService();
     }
-    return TodoService.instance;
+    return TodoService.#instance;
   }
 
   async loadFromLocalStorage() {
@@ -139,6 +144,7 @@ class TodoService {
     }
   }
 }
-const todoService = new TodoService();
+// getInstance()를 통해 단일 인스턴스 export
+const todoService = TodoService.getInstance();
 
 export default todoService;
