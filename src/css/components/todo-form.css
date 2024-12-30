@@ -20,7 +20,7 @@
   width: calc(100% - 40px);
   max-width: 600px;
   margin-left: 25px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   padding: 0.5rem;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -28,9 +28,13 @@
   font-size: 14px;
 }
 
+.form-page .form-group input#d-day {
+  max-width: 150px;
+}
+
 .form-page .form-group select {
   width: 80px;
-  margin: 5px 0 0 30px;
+  margin: 5px 0 5px 30px;
   padding: 5px;
   font-size: 14px;
 }
