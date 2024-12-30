@@ -19,7 +19,8 @@ class MainPage extends Page {
            <button class="addTodoBtn" aria-label="할 일 추가">+</button>
           <br>
         <div class ="buttons">
-             <button class="allDelete" aria-label="전체 삭제">X</button>
+             <button class="fliter" aria-label="필터"><i class="fas fa-filter"></i></button>
+             <button class="allDelete" aria-label="전체 삭제"><i class="fas fa-trash"></i></button>
         </div>
           <hr class="divider" />
           <ul id="todo-list"></ul>

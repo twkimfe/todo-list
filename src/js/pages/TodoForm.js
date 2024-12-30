@@ -1,5 +1,6 @@
 //./src/js/pages/TodoForm.js
 import todoService from "../services/TodoService.js";
+import { getStatusDisplay } from "../utils/statusUtils.js";
 
 class TodoForm {
   // todoService 객체를 class의 프로퍼티로 저장
@@ -68,6 +69,7 @@ class TodoForm {
     }
   }
 
+  // createForm 함수에서는 text를 사용
   createForm() {
     const form = document.createElement("form");
     form.innerHTML = `
@@ -75,14 +77,20 @@ class TodoForm {
       <label for ='todo-name'>할일</label>
         <input type='text' id='todo-name' required>
 
-      <label for ='todo-content'>내용</label>
-        <textarea id='todo-content'  placeholder="어떻게 하고 싶나요?" ></textarea>
+      <label for ='todo-content'>D-Day 설정</label>
+        <input type='date' id='d-day'></input>
          
       <label for ='todo-status'>진행 상황</label>
         <select id = 'todo-status' required>
-          <option value='pending'>미진행</option>
-          <option value='in-progress'>진행중</option>
-          <option value='completed'>완료</option>
+       <option value='pending'>${getStatusDisplay("pending", "text")}</option>
+        <option value='in-progress'>${getStatusDisplay(
+          "in-progress",
+          "text"
+        )}</option>
+        <option value='completed'>${getStatusDisplay(
+          "completed",
+          "text"
+        )}</option>
         </select>
     <div class='button-container'>
       <button type='cancel'>취소</button>
@@ -122,9 +130,7 @@ class TodoForm {
     const submitButton = this.formElement.querySelector(
       'button[type="submit"]'
     );
-    const inputs = this.formElement.querySelectorAll(
-      "input, textarea, select, button"
-    );
+    const inputs = this.formElement.querySelectorAll("input,  select, button");
 
     try {
       submitButton.disabled = true; // 버튼 비활성화
@@ -133,7 +139,7 @@ class TodoForm {
 
       const todoData = {
         name: this.formElement.querySelector("#todo-name").value,
-        content: this.formElement.querySelector("#todo-content").value,
+        dday: this.formElement.querySelector("#d-day").value,
         status: this.formElement.querySelector("#todo-status").value,
       };
 

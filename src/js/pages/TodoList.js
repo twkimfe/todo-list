@@ -1,4 +1,5 @@
 import todoService from "../services/TodoService.js";
+import { getStatusDisplay } from "../utils/statusUtils.js";
 
 class TodoList {
   constructor() {
@@ -112,12 +113,19 @@ class TodoList {
 
         <div class="todo-content">
           <p>${todo.name}</p>
-          </div>
-          
-          <div class="todo-actions">
-          <span class="todo-status">${this.getStatusText(todo.status)}</span>
-          <button class="edit-btn">수정</button>
-          <button class="delete-btn">-</button>
+        </div>
+        
+        <div class="dday">
+        <p>${todo.dday}</p>
+        </div>
+
+        <div class="todo-actions">
+          <span class="todo-status">${getStatusDisplay(
+            todo.status,
+            "icon"
+          )}</span>
+          <button class="edit-btn"><i class="fas fa-pen"></i></button>
+          <button class="delete-btn"><i class="fas fa-trash"></i></button>
         </div>
       </li>`
      )

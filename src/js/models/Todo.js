@@ -13,7 +13,7 @@ class Todo {
     return Todo.nextId++;
   }
 
-  constructor({ name, content, status = "pending" }) {
+  constructor({ name, dday, status = "pending" }) {
     if (!name) {
       throw new Error("할 일 이름이 필요합니다");
     }
@@ -25,24 +25,24 @@ class Todo {
     const nextId = Todo.getNextId();
     this.id = nextId !== null ? +nextId : 0;
     this.name = name;
-    this.content = content;
+    this.dday = dday;
     this.status = status;
     this.completed = false;
   }
 
   update(updateData) {
-    const { name, content, status } = updateData;
+    const { name, dday, status } = updateData;
 
     if (name) {
       this.name = name.trim();
     }
 
-    if (content !== undefined) {
-      this.content = content.trim();
+    if (dday !== undefined) {
+      this.dday = dday;
     }
 
     if (status) {
-      this.status = this.status;
+      this.status = status;
     }
   }
 
@@ -58,7 +58,7 @@ class Todo {
     return {
       id: this.id,
       name: this.name,
-      content: this.content,
+      dday: this.dday,
       status: this.status,
     };
   }
