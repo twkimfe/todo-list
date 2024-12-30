@@ -49,6 +49,11 @@ export class Router {
       return;
     }
 
+    if (this.currentComponent === route.component) {
+      return;
+      // 같은 컴포넌트면 재마운트 안 함
+    }
+
     // 현재 컴포넌트 언마운트
     try {
       if (this.currentComponent?.unmount) {
@@ -65,7 +70,6 @@ export class Router {
       if (!this.currentComponent?.mount) {
         throw new Error("Component must implement mount method");
       }
-
       this.currentComponent.mount(container);
     } catch (error) {
       console.error("Error during component initialization:", error);

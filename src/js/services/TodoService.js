@@ -75,7 +75,7 @@ class TodoService {
     try {
       const newTodo = new Todo(todoData);
       this.todos.push(newTodo);
-      this.saveToLocalStorage();
+      await this.saveToLocalStorage();
 
       return newTodo;
     } catch (error) {
@@ -85,7 +85,8 @@ class TodoService {
   }
 
   async getTodos() {
-    return this.todos;
+    // 배열 복사본 반환
+    return [...this.todos];
   }
 
   async updateTodo(id, updateData) {
@@ -94,9 +95,10 @@ class TodoService {
       // 찾지 못 할 때 null 반환
       if (index === -1) return null;
 
-      this.todos[index] = { ...this.todos[index], ...updateData };
+      const updatedTodo = { ...this.todos[index], ...updateData };
+      this.todos[index] = updatedTodo;
       await this.saveToLocalStorage();
-      return this.todos[index];
+      return updatedTodo;
     } catch (error) {
       console.error("수정 실패:", error);
       throw error;

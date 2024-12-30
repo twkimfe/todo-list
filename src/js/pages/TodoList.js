@@ -38,18 +38,35 @@ class TodoList {
 
   // 새 todo 생성 이벤트 핸들러
   async handleTodoCreated(event) {
+    const newTodo = event.detail;
+    // 전체 목록 새로고침 대신 새 항목만 추가
+    this.todos.push(newTodo);
+    this.renderTodo(newTodo);
     console.log("todo 생성됨:", event.detail);
-    await this.refreshTodos();
   }
 
   async handleTodoDeleted(event) {
+    const todoId = event.detail;
+    // DOM에서 해당 요소만 제거
+    const todoElement = this.container.querySelector(`[data-id="${todoId}"]`);
+    if (todoElement) {
+      todoElement.remove();
+    }
+    this.todos = this.todos.filter((todo) => todo.id !== todoId);
+
     console.log("todo 삭제됨:", event.detail);
-    await this.refreshTodos();
   }
 
   async handleTodoUpdated(event) {
+    const updatedTodo = event.detail;
+    // 해당 항목만 업데이트
+    const index = this.todos.findIndex((todo) => todo.id === updatedTodo.id);
+
+    if (index !== -1) {
+      this.todos[index] = updatedTodo;
+      this.updatedTodoElement(updatedTodo);
+    }
     console.log("todo 수정됨:", event.detail);
-    await this.refreshTodos();
   }
 
   async handleTodoToggled(event) {

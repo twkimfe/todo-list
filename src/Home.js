@@ -17,6 +17,11 @@ class Home {
       throw new Error("Container element is required");
     }
 
+    // 이미 마운트한 상태면 리턴
+    if (this.container === container) {
+      return;
+    }
+
     try {
       this.cleanup(); // 이전 이벤트 리스너들 정리
       this.container = container;
