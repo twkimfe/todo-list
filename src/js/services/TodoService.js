@@ -17,7 +17,9 @@ class TodoService {
     TodoService.#instance = this;
   }
 
+  //
   // 싱글톤 인스턴스 획득 메서드
+  //
   static getInstance() {
     if (!TodoService.#instance) {
       TodoService.#instance = new TodoService();
@@ -25,6 +27,8 @@ class TodoService {
     return TodoService.#instance;
   }
 
+  console.log('123');
+  
   async loadFromLocalStorage() {
     try {
       const savedTodos = localStorage.getItem("todos");
