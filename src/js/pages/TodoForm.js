@@ -8,6 +8,10 @@ class TodoForm {
     // 싱글톤 인스턴스 사용
     this.todoService = todoService;
     this.formElement = null;
+
+    this.isEditMode = false;
+    this.editingTodoId = null;
+
     this.event = {
       onCancel: () => {
         if (window.router) {
@@ -18,6 +22,7 @@ class TodoForm {
         this.handleSubmit(e);
       },
       onStatusChange: this.handleStatusChange.bind(this),
+      onEditTodoStart: this.handleEditTodoStart.bind(this),
     };
   }
 
@@ -59,13 +64,21 @@ class TodoForm {
     this.formElement = this.createForm();
     container.appendChild(this.formElement);
     this.bindEvents(); // 이벤트는 DOM 추가 후 바인딩
+
+    // edit 이벤트 리스너
+    document.addEventListener("editTodoStart", this.event.onEditTodoStart);
   }
 
   unmount() {
     if (this.formElement) {
       this.unbindEvents();
+
+      document.removeEventListener("editTodoStart", this.event.onEditTodoStart);
       this.formElement.remove();
       this.formElement = null;
+      // 상태 초기화
+      this.isEditMode = false;
+      this.editingTodoId = null;
     }
   }
 
@@ -147,30 +160,74 @@ class TodoForm {
       if (!todoData.name.trim()) {
         throw new Error("할일은 필수 입력값입니다.");
       }
-      // 1. Todo 생성 및 저장
-      const newTodo = await this.todoService.createTodo(todoData);
 
-      // 이벤트 객체 직접 생성
-      const todoCreatedEvent = new CustomEvent("todoCreated", {
-        detail: { todo: newTodo },
-        bubbles: true,
-        composed: true,
-      });
+      let resultTodo;
+      // 수정 모드, 생성 모드 분리
+      if (this.isEditMode) {
+        resultTodo = await this.todoService.updateTodo(
+          this.editingTodoId,
+          todoData
+        );
 
-      // dispatchEvent 메서드 대신 직접 이벤트 발생
-      this.formElement.dispatchEvent(todoCreatedEvent);
+        const todoUpdatedEvent = new CustomEvent("todoUpdated", {
+          detail: { todo: resultTodo },
+          bubbles: true,
+          composed: true,
+        });
+        this.formElement.dispatchEvent(todoUpdatedEvent);
+      } else {
+        // Todo 생성 및 저장
+        resultTodo = await this.todoService.createTodo(todoData);
+
+        // 이벤트 객체 직접 생성
+        const todoCreatedEvent = new CustomEvent("todoCreated", {
+          detail: { todo: resultTodo },
+          bubbles: true,
+          composed: true,
+        });
+
+        // dispatchEvent 메서드 대신 직접 이벤트 발생
+        this.formElement.dispatchEvent(todoCreatedEvent);
+      }
 
       if (window.router) {
         window.router.navigate("/");
       }
     } catch (error) {
-      console.error("Error creating todo:", error);
+      console.error(
+        this.isEditMode ? "Error updating todo:" : "Error creating todo:",
+        error
+      );
       submitButton.disabled = false;
       inputs.forEach((input) => (input.disabled = false));
 
       this.dispatchEvent("error", {
         message: error.message || "오류가 생겼습니다, 죄송합니다!",
       });
+    }
+  }
+
+  handleEditTodoStart(event) {
+    const todo = event.detail.todo;
+    this.isEditMode = true;
+    this.editingTodoId = todo.id;
+
+    const nameInput = this.formElement.querySelector("#todo-name");
+    const ddayInput = this.formElement.querySelector("#d-day");
+    const statusSelect = this.formElement.querySelector("#todo-status");
+
+    if (nameInput && ddayInput && statusSelect) {
+      nameInput.value = todo.name;
+      ddayInput.value = todo.dday;
+      statusSelect.value = todo.status;
+    }
+
+    // btn 텍스트 변경
+    const submitButton = this.formElement.querySelector(
+      'button[type="submit"]'
+    );
+    if (submitButton) {
+      submitButton.textContent = "수정";
     }
   }
 

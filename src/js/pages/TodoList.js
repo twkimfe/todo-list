@@ -165,8 +165,12 @@ class TodoList {
 
     this.container.querySelectorAll(".edit-btn").forEach((button) => {
       button.addEventListener("click", (e) => {
-        const todoId = e.target.closest(".todo-item").dataset.id;
-        this.editTodo(todoId);
+        // 이벤트 타겟이 i 태그일 수 있으므로 closest로 todo-item을 찾아 id 가져오기
+        const todoItem = e.target.closest(".todo-item");
+        if (todoItem) {
+          const todoId = todoItem.dataset.id;
+          this.editTodo(todoId);
+        }
       });
     });
 
@@ -220,10 +224,12 @@ class TodoList {
   async editTodo(todoId) {
     const todo = this.todos.find((todo) => todo.id === todoId);
     if (todo) {
-      // 수정 이벤트
-      this.container.dispatchEvent(
+      // todoForm을 호출하고 기존 데이터를 전달하는 커스텀 이벤트 발생
+      document.dispatchEvent(
         new CustomEvent("editTodoRequested", {
-          detail: { todo },
+          detail: {
+            todo: todo,
+          },
           bubbles: true,
         })
       );
