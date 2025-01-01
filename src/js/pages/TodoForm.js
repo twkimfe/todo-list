@@ -22,7 +22,7 @@ class TodoForm {
         this.handleSubmit(e);
       },
       onStatusChange: this.handleStatusChange.bind(this),
-      onEditTodoStart: this.handleEditTodoStart.bind(this),
+      onEditTodoRequested: this.handleEditTodoRequested,
     };
   }
 
@@ -65,15 +65,17 @@ class TodoForm {
     container.appendChild(this.formElement);
     this.bindEvents(); // 이벤트는 DOM 추가 후 바인딩
 
-    // edit 이벤트 리스너
-    document.addEventListener("editTodoStart", this.event.onEditTodoStart);
+    // page 마운트 시, 이벤트 리스너 등록
+    document.addEventListener(
+      "editTodoRequested",
+      this.event.onEditTodoRequested
+    );
   }
 
   unmount() {
     if (this.formElement) {
       this.unbindEvents();
 
-      document.removeEventListener("editTodoStart", this.event.onEditTodoStart);
       this.formElement.remove();
       this.formElement = null;
       // 상태 초기화
@@ -207,7 +209,13 @@ class TodoForm {
     }
   }
 
-  handleEditTodoStart(event) {
+  handleEditTodoRequested(event) {
+    // formElement가 없으면 early return
+    if (!this.formElement || !event.detail || !event.detail.todo) {
+      console.warn("Form element not ready for edit");
+      return;
+    }
+
     const todo = event.detail.todo;
     this.isEditMode = true;
     this.editingTodoId = todo.id;
@@ -216,18 +224,21 @@ class TodoForm {
     const ddayInput = this.formElement.querySelector("#d-day");
     const statusSelect = this.formElement.querySelector("#todo-status");
 
+    // 모든 필드가 존재하는지 확인
     if (nameInput && ddayInput && statusSelect) {
-      nameInput.value = todo.name;
-      ddayInput.value = todo.dday;
-      statusSelect.value = todo.status;
-    }
+      nameInput.value = todo.name || "";
+      ddayInput.value = todo.dday || "";
+      statusSelect.value = todo.status || "pending";
 
-    // btn 텍스트 변경
-    const submitButton = this.formElement.querySelector(
-      'button[type="submit"]'
-    );
-    if (submitButton) {
-      submitButton.textContent = "수정";
+      // btn 텍스트 변경
+      const submitButton = this.formElement.querySelector(
+        'button[type="submit"]'
+      );
+      if (submitButton) {
+        submitButton.textContent = "수정";
+      } else {
+        console.warn("미입력 값이 있습니다");
+      }
     }
   }
 

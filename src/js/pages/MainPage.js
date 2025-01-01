@@ -1,6 +1,7 @@
 // src/js/pages/MainPage.js
 import Page from "./Page.js";
 import TodoList from "./TodoList.js";
+import todoService from "../services/TodoService.js";
 
 class MainPage extends Page {
   constructor() {
@@ -31,14 +32,35 @@ class MainPage extends Page {
 
   bindEvents() {
     const addButton = this.container.querySelector(".addTodoBtn");
+    const deleteAllButton = this.container.querySelector(".allDelete");
+
     if (addButton) {
       addButton.addEventListener("click", this.handleAddButtonClick.bind(this));
+    }
+
+    if (deleteAllButton) {
+      deleteAllButton.addEventListener(
+        "click",
+        this.handleDeleteAllClick.bind(this)
+      );
     }
   }
 
   handleAddButtonClick() {
     if (window.router) {
       window.router.navigate("/new");
+    }
+  }
+
+  async handleDeleteAllClick() {
+    try {
+      const result = await todoService.deleteAllTodos();
+      if (result) {
+        // 목록 성공 전체 삭제 시, 화면 새로고침
+        this.todoList.refreshTodos();
+      }
+    } catch (error) {
+      console.error("삭제 실패 했습니다", error);
     }
   }
 

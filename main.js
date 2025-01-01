@@ -6,6 +6,7 @@ import FormPage from "./src/js/pages/FormPage.js";
 const routes = {
   "/": { component: MainPage },
   "/new": { component: FormPage },
+  "/edit": { component: FormPage },
 };
 
 // 앱 초기화 함수
