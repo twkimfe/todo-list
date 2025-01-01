@@ -27,8 +27,6 @@ class TodoService {
     return TodoService.#instance;
   }
 
-  console.log('123');
-  
   async loadFromLocalStorage() {
     try {
       const savedTodos = localStorage.getItem("todos");

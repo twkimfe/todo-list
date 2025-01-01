@@ -26,6 +26,10 @@ ul.todo-list {
   margin: 0 10px;
 }
 
+.todo-checkbox .toggle-checkbox {
+  cursor: pointer;
+}
+
 .todo-content {
   max-width: 500px;
   flex-grow: 1;
@@ -61,6 +65,7 @@ button {
   border: none;
   font-size: 16px;
   border-radius: 5px;
+  cursor: pointer;
 }
 
 .edit-btn {
@@ -74,6 +79,7 @@ button {
   align-items: center;
   margin-left: auto; /* todo-actions를 오른쪽으로 밀어냄 */
   gap: 0; /* 기존 gap 제거하고 개별 요소의 margin으로 조정 */
+  cursor: pointer;
 }
 
 .delete-btn {
