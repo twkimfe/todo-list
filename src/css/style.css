@@ -55,6 +55,7 @@ h3 {
   display: flex;
   justify-content: space-between;
   position: relative;
+  cursor: pointer;
 }
 
 .buttons :hover {
