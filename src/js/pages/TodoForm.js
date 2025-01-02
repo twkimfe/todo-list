@@ -8,21 +8,28 @@ class TodoForm {
     // 싱글톤 인스턴스 사용
     this.todoService = todoService;
     this.formElement = null;
+    this.isEventProcessed = false;
 
-    this.isEditMode = false;
-    this.editingTodoId = null;
+    // 이벤트 핸들러 바인딩을 생성자에서 처리
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
+    this.handleStatusChange = this.handleStatusChange.bind(this);
+    this.handleEditTodoRequested = this.handleEditTodoRequested.bind(this);
 
     this.event = {
-      onCancel: () => {
-        if (window.router) {
-          window.router.navigate("/");
-        }
-      },
-      onSubmit: (e) => {
-        this.handleSubmit(e);
-      },
-      onStatusChange: this.handleStatusChange.bind(this),
+      onSubmit: this.handleSubmit,
+      onCancel: this.handleCancel,
+      onStatusChange: this.handleStatusChange,
       onEditTodoRequested: this.handleEditTodoRequested,
+    };
+  }
+
+  // form data 수집 메서드
+  getFormData() {
+    return {
+      name: this.formElement.querySelector("#todo-name").value,
+      dday: this.formElement.querySelector("#d-day").value,
+      status: this.formElement.querySelector("#todo-status").value,
     };
   }
 
@@ -76,11 +83,16 @@ class TodoForm {
     if (this.formElement) {
       this.unbindEvents();
 
+      // editTodoRequested 이벤트 리스너 제거 추가
+      document.removeEventListener(
+        "editTodoRequested",
+        this.event.onEditTodoRequested
+      );
+
       this.formElement.remove();
       this.formElement = null;
       // 상태 초기화
-      this.isEditMode = false;
-      this.editingTodoId = null;
+      this.todoService.clearEditMode();
     }
   }
 
@@ -116,7 +128,7 @@ class TodoForm {
     return form;
   }
 
-  // 커스텀 이벤트 치러 동일
+  // 커스텀 이벤트 처리 동일
   dispatchEvent(eventName, detail = {}) {
     // 이벤트가 이미 처리되었는지 확인하는 플래그 추가
     if (this.isEventProcessed) return;
@@ -140,105 +152,64 @@ class TodoForm {
 
   async handleSubmit(event) {
     event.preventDefault();
-
-    // 폼 전체 비활성화
-    const submitButton = this.formElement.querySelector(
-      'button[type="submit"]'
-    );
-    const inputs = this.formElement.querySelectorAll("input,  select, button");
+    const formData = this.getFormData();
 
     try {
-      submitButton.disabled = true; // 버튼 비활성화
-      // 모든 입력 요소 비활성화
-      inputs.forEach((input) => (input.disabled = true));
+      const editMode = this.todoService.editMode;
+      const resultTodo = editMode.isEdit
+        ? await this.todoService.updateTodo(editMode.editingId, formData)
+        : await this.todoService.createTodo(formData);
 
-      const todoData = {
-        name: this.formElement.querySelector("#todo-name").value,
-        dday: this.formElement.querySelector("#d-day").value,
-        status: this.formElement.querySelector("#todo-status").value,
-      };
-
-      // 유효성 검사 추가
-      if (!todoData.name.trim()) {
-        throw new Error("할일은 필수 입력값입니다.");
-      }
-
-      let resultTodo;
-      // 수정 모드, 생성 모드 분리
-      if (this.isEditMode) {
-        resultTodo = await this.todoService.updateTodo(
-          this.editingTodoId,
-          todoData
-        );
-
-        const todoUpdatedEvent = new CustomEvent("todoUpdated", {
-          detail: { todo: resultTodo },
-          bubbles: true,
-          composed: true,
-        });
-        this.formElement.dispatchEvent(todoUpdatedEvent);
-      } else {
-        // Todo 생성 및 저장
-        resultTodo = await this.todoService.createTodo(todoData);
-
-        // 이벤트 객체 직접 생성
-        const todoCreatedEvent = new CustomEvent("todoCreated", {
-          detail: { todo: resultTodo },
-          bubbles: true,
-          composed: true,
-        });
-
-        // dispatchEvent 메서드 대신 직접 이벤트 발생
-        this.formElement.dispatchEvent(todoCreatedEvent);
-      }
-
-      if (window.router) {
-        window.router.navigate("/");
-      }
-    } catch (error) {
-      console.error(
-        this.isEditMode ? "Error updating todo:" : "Error creating todo:",
-        error
-      );
-      submitButton.disabled = false;
-      inputs.forEach((input) => (input.disabled = false));
-
-      this.dispatchEvent("error", {
-        message: error.message || "오류가 생겼습니다, 죄송합니다!",
+      this.dispatchEvent(editMode.isEdit ? "todoUpdated" : "todoCreated", {
+        todo: resultTodo,
       });
+      this.todoService.clearEditMode();
+      window.router?.navigate("/");
+    } catch (error) {
+      this.handleSubmitError(error);
+    }
+  }
+
+  handleSubmitError(error) {
+    console.error("Form 제출 에러:", error);
+    this.dispatchEvent("error", {
+      message: error.message || "오류가 발생했습니다.",
+    });
+  }
+
+  handleCancel() {
+    // EditMode 초기화
+    this.todoService.clearEditMode();
+    if (window.router) {
+      window.router.navigate("/");
     }
   }
 
   handleEditTodoRequested(event) {
     // formElement가 없으면 early return
-    if (!this.formElement || !event.detail || !event.detail.todo) {
-      console.warn("Form element not ready for edit");
-      return;
-    }
+    if (!this.formElement || !event.detail?.todo) return;
 
     const todo = event.detail.todo;
-    this.isEditMode = true;
-    this.editingTodoId = todo.id;
+    // TodoService에서 상태 관리
+    this.todoService.setEditMode(todo);
+    this.updateFormWithTodo(todo);
+  }
 
-    const nameInput = this.formElement.querySelector("#todo-name");
-    const ddayInput = this.formElement.querySelector("#d-day");
-    const statusSelect = this.formElement.querySelector("#todo-status");
+  // todoForm 업데이트 로직 분리
+  updateFormWithTodo(todo) {
+    const elements = {
+      name: this.formElement.querySelector("#todo-name"),
+      dday: this.formElement.querySelector("#d-day"),
+      status: this.formElement.querySelector("#todo-status"),
+      submit: this.formElement.querySelector('button[type="submit"]'),
+    };
 
     // 모든 필드가 존재하는지 확인
-    if (nameInput && ddayInput && statusSelect) {
-      nameInput.value = todo.name || "";
-      ddayInput.value = todo.dday || "";
-      statusSelect.value = todo.status || "pending";
-
-      // btn 텍스트 변경
-      const submitButton = this.formElement.querySelector(
-        'button[type="submit"]'
-      );
-      if (submitButton) {
-        submitButton.textContent = "수정";
-      } else {
-        console.warn("미입력 값이 있습니다");
-      }
+    if (Object.values(elements).every((el) => el)) {
+      elements.name.value = todo.name || "";
+      elements.dday.value = todo.dday || "";
+      elements.status.value = todo.status || "pending";
+      elements.submit.textContent = "수정";
     }
   }
 

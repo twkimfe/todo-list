@@ -43,10 +43,10 @@ export class Router {
 
     if (!route || !route.component) {
       console.error(`No route found for path: ${path}`);
-      if (path !== "/") {
+      if (path === "/edit" && !todoService.editMode.isEdit) {
         this.navigate("/");
+        return;
       }
-      return;
     }
 
     if (this.currentComponent === route.component) {

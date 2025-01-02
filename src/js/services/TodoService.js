@@ -15,6 +15,28 @@ class TodoService {
     this.todos = [];
     this.loadFromLocalStorage();
     TodoService.#instance = this;
+
+    this.editMode = {
+      isEdit: false,
+      editingId: null,
+      editingData: null,
+    };
+  }
+
+  setEditMode(todo) {
+    this.editMode = {
+      isEdit: true,
+      editingId: todo.id,
+      editingData: { ...todo },
+    };
+  }
+
+  clearEditMode() {
+    this.editMode = {
+      isEdit: false,
+      editingId: null,
+      editingData: null,
+    };
   }
 
   // 싱글톤 인스턴스 획득 메서드
@@ -67,8 +89,8 @@ class TodoService {
 
   _findTodoIndex(id) {
     // null 체크 추가
-    if (id === null) return -1;
-    return this.todos.findIndex((todo) => todo.id === +id);
+    if (id === null || id === undefined) return -1;
+    return this.todos.findIndex((todo) => todo.id === Number(id));
   }
 
   async createTodo(todoData) {
@@ -91,11 +113,18 @@ class TodoService {
 
   async updateTodo(id, updateData) {
     try {
-      const index = this._findTodoIndex(id);
+      const index = this._findTodoIndex(Number(id));
       // 찾지 못 할 때 null 반환
       if (index === -1) return null;
 
-      const updatedTodo = { ...this.todos[index], ...updateData };
+      // 기존 데이터 유지하면서 업데이트
+      const updatedTodo = {
+        ...this.todos[index],
+        ...updateData,
+        // id 타입 통일
+        id: Number(id),
+      };
+
       this.todos[index] = updatedTodo;
       await this.saveToLocalStorage();
       return updatedTodo;
