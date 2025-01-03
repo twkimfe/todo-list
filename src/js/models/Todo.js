@@ -28,6 +28,8 @@ class Todo {
     this.dday = dday;
     this.status = status;
     this.previousStatus = previousStatus;
+    this.createdAt = new Date().toISOString();
+    // todo 생성 시간
   }
 
   update(updateData) {

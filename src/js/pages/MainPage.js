@@ -7,6 +7,7 @@ class MainPage extends Page {
   constructor() {
     super();
     this.todoList = TodoList;
+    this.currentFilter = null;
   }
 
   template() {
@@ -20,7 +21,12 @@ class MainPage extends Page {
            <button class="addTodoBtn" aria-label="할 일 추가">+</button>
           <br>
         <div class ="buttons">
-             <button class="fliter" aria-label="필터"><i class="fas fa-filter"></i></button>
+             <button class="filter" aria-label="필터"><i class="fas fa-filter"></i></button>
+              <div class="filter-dropdown hidden">
+              <div class="filter-option" data-filter="lastest">최신순</div>
+              <div class="filter-option" data-filter="incomplete">미완성</div>
+              <div class="filter-option" data-filter="complete">완성</div>
+        </div>
              <button class="allDelete" aria-label="전체 삭제"><i class="fas fa-trash"></i></button>
         </div>
           <hr class="divider" />
@@ -43,6 +49,56 @@ class MainPage extends Page {
         "click",
         this.handleDeleteAllClick.bind(this)
       );
+    }
+    // 필터 관련 이벤트 바인딩을 별도 메서드로 분리
+    this.bindFilterEvents();
+  }
+
+  bindFilterEvents() {
+    const filterBtn = this.container.querySelector(".filter");
+    const filterDropdown = this.container.querySelector(".filter-dropdown");
+    const filterOptions = this.container.querySelectorAll(".filter-option");
+
+    if (!filterBtn || !filterDropdown || !filterOptions.length) return;
+
+    // filter 버튼 클릭 이벤트
+    filterBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      filterDropdown.classList.toggle("hidden");
+    });
+
+    // filter option 클릭 이벤트
+    filterOptions.forEach((option) => {
+      option.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const filterType = e.target.dataset.filter;
+        this.currentFilter = filterType;
+
+        // 선택 옵션 스타일링
+        filterOptions.forEach((opt) => {
+          opt.classList.remove("selected");
+        });
+        e.target.classList.add("selected");
+
+        // 피터링 실행
+        await this.applyFilter(filterType);
+        filterDropdown.classList.add("hidden");
+      });
+    });
+
+    // 외부 클릭 시 드롭다운 닫기
+    document.addEventListener("click", () => {
+      filterDropdown.classList.add("hidden");
+    });
+  }
+
+  async applyFilter(filterType) {
+    try {
+      const filteredTodos = await todoService.getFilteredTodos(filterType);
+      this.todoList.todos = filteredTodos;
+      this.todoList.render();
+    } catch (error) {
+      console.error("filter failed:", error);
     }
   }
 

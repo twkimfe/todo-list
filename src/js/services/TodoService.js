@@ -39,9 +39,7 @@ class TodoService {
     };
   }
 
-  //
   // 싱글톤 인스턴스 획득 메서드
-  //
   static getInstance() {
     if (!TodoService.#instance) {
       TodoService.#instance = new TodoService();
@@ -209,6 +207,27 @@ class TodoService {
     } catch (error) {
       console.error("토글 실패:", error);
       throw error;
+    }
+  }
+
+  async getFilteredTodos(filterType) {
+    const allTodos = await this.getTodos();
+
+    switch (filterType) {
+      case "lastest":
+        return allTodos.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+      case "incomplete":
+        return allTodos
+          .filter((todo) => todo.status !== "completed")
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      case "complete":
+        return allTodos
+          .filter((todo) => todo.status === "completed")
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      default:
+        return allTodos;
     }
   }
 }
