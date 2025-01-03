@@ -232,17 +232,22 @@ class TodoList {
       this.todos.map((todo) => ({ id: todo.id, type: typeof todo.id }))
     );
     if (todo) {
-      const editEvent = new CustomEvent("editTodoRequested", {
-        detail: { todo },
-        bubbles: true,
-      });
-      // todoForm을 호출하고 기존 데이터를 전달하는 커스텀 이벤트 발생
-      document.dispatchEvent(editEvent);
-      console.log("editTodoRequested 이벤트 발생 완료"); // 이벤트 발생 확인
+      // 1.먼저 editMode 설정
+      this.todoService.setEditMode(todo);
+      // 2.라우팅
       if (window.router) {
         window.router.navigate("/edit");
         console.log("라우팅 완료"); // 라우팅 완료 확인
       }
+      // 3.이벤트 발생
+      setTimeout(() => {
+        const editEvent = new CustomEvent("editTodoRequested", {
+          detail: { todo },
+          bubbles: true,
+        });
+        document.dispatchEvent(editEvent);
+        console.log("editTodoRequested 이벤트 발생 완료"); // 이벤트 발생 확인
+      }, 0);
     }
   }
 }

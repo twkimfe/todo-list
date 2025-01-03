@@ -27,7 +27,6 @@ class Todo {
     this.name = name;
     this.dday = dday;
     this.status = status;
-    this.completed = false;
   }
 
   update(updateData) {
