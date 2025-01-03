@@ -152,12 +152,44 @@ class TodoService {
     try {
       const index = this._findTodoIndex(id);
       if (index !== -1) {
-        this.todos[index].done = !this.todos[index].done;
-        this.saveToLocalStorage();
-        return this.todos[index];
+        const todo = this.todos[index];
+
+        // checkbox 토글에 따라 상태 변경
+        if (todo.status === "completed") {
+          // completed-> todo.status
+          todo.status = todo.previousStatus || "pending";
+          todo.previousStatus = null;
+          // 이전 상태 초기화
+        } else {
+          // 현 상태를 previousStatus에 저장하고 completed로 변경
+          todo.previousStatus = todo.status;
+          todo.status = "completed";
+        }
+        await this.saveToLocalStorage();
+        return todo;
       }
     } catch (error) {
       console.error("토글 실패:", error);
+      throw error;
+    }
+  }
+
+  async cycleTodoStatus(id) {
+    try {
+      const index = this._findTodoIndex(id);
+      if (index !== -1) {
+        const currentTodo = this.todos[index];
+        const statusCycle = {
+          pending: "in-progress",
+          "in-progress": "completed",
+          completed: "pending",
+        };
+        currentTodo.status = statusCycle[currentTodo.status];
+        await this.saveToLocalStorage();
+        return currentTodo;
+      }
+    } catch (error) {
+      console.error("상태 변경 실패", error);
       throw error;
     }
   }
@@ -172,6 +204,27 @@ class TodoService {
     } catch (error) {
       console.error("토글 실패:", error);
       throw error;
+    }
+  }
+
+  async getFilteredTodos(filterType) {
+    const allTodos = await this.getTodos();
+
+    switch (filterType) {
+      case "lastest":
+        return allTodos.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+      case "incomplete":
+        return allTodos
+          .filter((todo) => todo.status !== "completed")
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      case "complete":
+        return allTodos
+          .filter((todo) => todo.status === "completed")
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      default:
+        return allTodos;
     }
   }
 }

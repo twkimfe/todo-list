@@ -1,5 +1,8 @@
+// TodoList.js
 import todoService from "../services/TodoService.js";
 import { getStatusDisplay } from "../utils/statusUtils.js";
+import { calculateDday } from "../utils/ddayUtils.js";
+import { updateButtonsHide } from "../utils/buttonHideUtils.js";
 
 class TodoList {
   constructor() {
@@ -30,8 +33,9 @@ class TodoList {
   async refreshTodos() {
     try {
       this.todos = await this.todoService.getTodos();
-      console.log("가져온 todos:", this.todos);
       this.render();
+
+      updateButtonsHide(this.todos);
     } catch (error) {
       console.error("data 새로고침 실패:", error);
     }
@@ -53,9 +57,7 @@ class TodoList {
     if (todoElement) {
       todoElement.remove();
     }
-    this.todos = this.todos.filter((todo) => todo.id !== todoId);
-
-    console.log("todo 삭제됨:", event.detail);
+    await this.deleteTodo(todoId);
   }
 
   async handleTodoUpdated(event) {
@@ -102,8 +104,9 @@ class TodoList {
     return `
   <ul class="todo-list">
    ${this.todos
-     .map(
-       (todo) => `
+     .map((todo) => {
+       const dday = calculateDday(todo.dday);
+       return `
       <li class="todo-item ${todo.status}" data-id="${todo.id}">
         <div class="todo-checkbox">
           <input type="checkbox"
@@ -115,8 +118,8 @@ class TodoList {
           <p>${todo.name}</p>
         </div>
         
-        <div class="dday">
-        <p>${todo.dday}</p>
+        <div class="dday ${dday.cssClass}">
+        <p>${dday.text}</p>
         </div>
 
         <div class="todo-actions">
@@ -127,8 +130,8 @@ class TodoList {
           <button class="edit-btn"><i class="fas fa-pen"></i></button>
           <button class="delete-btn"><i class="fas fa-trash"></i></button>
         </div>
-      </li>`
-     )
+      </li>`;
+     })
      .join("")}
   </ul>
   `;
@@ -170,7 +173,6 @@ class TodoList {
         if (todoItem) {
           const todoId = todoItem.dataset.id;
           this.editTodo(todoId);
-          console.log("edit 작동");
         }
       });
     });
@@ -179,17 +181,27 @@ class TodoList {
     this.container.querySelectorAll(".toggle-checkbox").forEach((checkbox) => {
       checkbox.addEventListener("change", async (e) => {
         const todoId = e.target.closest(".todo-item").dataset.id;
-        const todo = this.todos.find((todo) => todo.id === todoId);
 
-        if (todo) {
-          try {
-            await this.todoService.toggleTodo(todoId);
-            // 전체 목록을 다시 불러서 최신 상태 유지
-            this.todos = await this.todoService.getTodos();
-            this.render();
-          } catch (error) {
-            console.error("상태 수정 실패:", error);
-          }
+        try {
+          const updatedTodo = await this.todoService.toggleTodo(todoId);
+          // 상태 변경, 화면 갱신
+          await this.refreshTodos();
+        } catch (error) {
+          console.error("상태 수정 실패:", error);
+        }
+      });
+    });
+
+    // todo-status 클릭 이벤트
+    this.container.querySelectorAll(".todo-status").forEach((statusElement) => {
+      statusElement.addEventListener("click", async (e) => {
+        const todoId = e.target.closest(".todo-item").dataset.id;
+        try {
+          await this.todoService.cycleTodoStatus(todoId);
+          this.todos = await this.todoService.getTodos();
+          this.render();
+        } catch (error) {
+          console.error("상태 변경 실패:", error);
         }
       });
     });
@@ -216,6 +228,7 @@ class TodoList {
         // 최신 목록 불러오기
         this.todos = await this.todoService.getTodos();
         this.render();
+        updateButtonsHide(this.todos);
       }
     } catch (error) {
       console.error("Todo 삭제 실패:", error);
@@ -223,26 +236,23 @@ class TodoList {
   }
 
   async editTodo(todoId) {
-    console.log("받은 todoId:", todoId, typeof todoId);
-    console.log("현재 todos:", this.todos);
     const todo = this.todos.find((todo) => todo.id === Number(todoId));
-    console.log("찾은 todo:", todo);
-    console.log(
-      "현재 todos 상세:",
-      this.todos.map((todo) => ({ id: todo.id, type: typeof todo.id }))
-    );
+
     if (todo) {
-      const editEvent = new CustomEvent("editTodoRequested", {
-        detail: { todo },
-        bubbles: true,
-      });
-      // todoForm을 호출하고 기존 데이터를 전달하는 커스텀 이벤트 발생
-      document.dispatchEvent(editEvent);
-      console.log("editTodoRequested 이벤트 발생 완료"); // 이벤트 발생 확인
+      // 1.먼저 editMode 설정
+      this.todoService.setEditMode(todo);
+      // 2.라우팅
       if (window.router) {
         window.router.navigate("/edit");
-        console.log("라우팅 완료"); // 라우팅 완료 확인
       }
+      // 3.이벤트 발생
+      setTimeout(() => {
+        const editEvent = new CustomEvent("editTodoRequested", {
+          detail: { todo },
+          bubbles: true,
+        });
+        document.dispatchEvent(editEvent);
+      }, 0);
     }
   }
 }

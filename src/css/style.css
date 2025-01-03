@@ -56,6 +56,30 @@ h3 {
   justify-content: space-between;
   position: relative;
   cursor: pointer;
+  transition: all 0.3s ease;
+  height: 32px;
+}
+
+.buttons.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  height: 0;
+  margin: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.buttons.hidden .filter-dropdown {
+  visibility: visible;
+  transform: none;
+  height: auto;
+  pointer-events: auto;
+  opacity: 1;
+  display: none;
+}
+
+.filter-dropdown:not(.hidden) {
+  z-index: 1000;
 }
 
 .buttons :hover {
@@ -69,4 +93,47 @@ h3 {
 
   border: none;
   border-radius: 5px;
+}
+
+.filter-container {
+  position: relative;
+  display: inline-block;
+}
+
+.filter-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  min-width: 120px;
+  z-index: 1000;
+}
+
+.filter-dropdown.hidden {
+  display: none;
+}
+
+.filter-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-option:hover {
+  background-color: #f5f5f5;
+}
+
+.filter-option.selected {
+  color: skyblue;
+  font-weight: bold;
+}
+
+.plan-message {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }

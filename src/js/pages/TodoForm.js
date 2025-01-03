@@ -72,6 +72,12 @@ class TodoForm {
     container.appendChild(this.formElement);
     this.bindEvents(); // 이벤트는 DOM 추가 후 바인딩
 
+    // editMode 체크, 폼 업데이트
+    const editMode = this.todoService.editMode;
+    if (editMode.isEdit && editMode.editingData) {
+      this.updateFormWithTodo(editMode.editingData);
+    }
+
     // page 마운트 시, 이벤트 리스너 등록
     document.addEventListener(
       "editTodoRequested",

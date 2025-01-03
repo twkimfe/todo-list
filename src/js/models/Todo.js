@@ -13,7 +13,7 @@ class Todo {
     return Todo.nextId++;
   }
 
-  constructor({ name, dday, status = "pending" }) {
+  constructor({ name, dday, status = "pending", previousStatus = null }) {
     if (!name) {
       throw new Error("할 일 이름이 필요합니다");
     }
@@ -27,7 +27,9 @@ class Todo {
     this.name = name;
     this.dday = dday;
     this.status = status;
-    this.completed = false;
+    this.previousStatus = previousStatus;
+    this.createdAt = new Date().toISOString();
+    // todo 생성 시간
   }
 
   update(updateData) {
@@ -60,6 +62,8 @@ class Todo {
       name: this.name,
       dday: this.dday,
       status: this.status,
+      previousStatus: this.previousStatus,
+      // 이전 상태 저장
     };
   }
 }
