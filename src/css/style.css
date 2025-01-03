@@ -106,3 +106,10 @@ h3 {
   color: skyblue;
   font-weight: bold;
 }
+
+.plan-message {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}

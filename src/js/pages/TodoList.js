@@ -1,5 +1,6 @@
 import todoService from "../services/TodoService.js";
 import { getStatusDisplay } from "../utils/statusUtils.js";
+import { calculateDday } from "../utils/ddayUtils.js";
 
 class TodoList {
   constructor() {
@@ -102,8 +103,9 @@ class TodoList {
     return `
   <ul class="todo-list">
    ${this.todos
-     .map(
-       (todo) => `
+     .map((todo) => {
+       const dday = calculateDday(todo.dday);
+       return `
       <li class="todo-item ${todo.status}" data-id="${todo.id}">
         <div class="todo-checkbox">
           <input type="checkbox"
@@ -115,8 +117,8 @@ class TodoList {
           <p>${todo.name}</p>
         </div>
         
-        <div class="dday">
-        <p>${todo.dday}</p>
+        <div class="dday ${dday.cssClass}">
+        <p>${dday.text}</p>
         </div>
 
         <div class="todo-actions">
@@ -127,8 +129,8 @@ class TodoList {
           <button class="edit-btn"><i class="fas fa-pen"></i></button>
           <button class="delete-btn"><i class="fas fa-trash"></i></button>
         </div>
-      </li>`
-     )
+      </li>`;
+     })
      .join("")}
   </ul>
   `;
@@ -261,6 +263,7 @@ class TodoList {
         console.log("editTodoRequested 이벤트 발생 완료"); // 이벤트 발생 확인
       }, 0);
     }
+    console.log("todolist 렌더링");
   }
 }
 

@@ -15,7 +15,7 @@ class MainPage extends Page {
       <div class="container">
         <header>
           <h1>Todo List</h1>
-          <h3>PLAN it, DO it.</h3>
+          <h3 class="plan-message">PLAN it, DO it.</h3>
         </header>
         <div id="app">
            <button class="addTodoBtn" aria-label="할 일 추가">+</button>
@@ -39,6 +39,19 @@ class MainPage extends Page {
   bindEvents() {
     const addButton = this.container.querySelector(".addTodoBtn");
     const deleteAllButton = this.container.querySelector(".allDelete");
+
+    // h3-headerHtml click
+    let clickCount = 0;
+    const messageElement = this.container.querySelector(".plan-message");
+    if (messageElement) {
+      messageElement.addEventListener("click", () => {
+        clickCount++;
+        if (clickCount === 5) {
+          alert("이용해주셔서 감사합니다, 더 열심히 하겠습니다! :) _TWKim");
+          clickCount = 0;
+        }
+      });
+    }
 
     if (addButton) {
       addButton.addEventListener("click", this.handleAddButtonClick.bind(this));

@@ -118,3 +118,24 @@ button {
 .completed .todo-status {
   background-color: #32cd32;
 }
+
+/* D-day css */
+.dday {
+  margin-left: auto;
+  padding: 0 10px;
+  min-width: 80px;
+  text-align: center;
+}
+
+.dday-passed {
+  color: grey;
+}
+
+.dday-future {
+  color: black;
+}
+
+.dday-near {
+  font-weight: bold;
+  color: red;
+}
