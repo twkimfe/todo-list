@@ -33,7 +33,6 @@ class TodoList {
   async refreshTodos() {
     try {
       this.todos = await this.todoService.getTodos();
-      console.log("[TodoList] 현재 todos 길이:", this.todos.length);
       this.render();
 
       updateButtonsHide(this.todos);
@@ -174,7 +173,6 @@ class TodoList {
         if (todoItem) {
           const todoId = todoItem.dataset.id;
           this.editTodo(todoId);
-          console.log("edit 작동");
         }
       });
     });
@@ -183,11 +181,9 @@ class TodoList {
     this.container.querySelectorAll(".toggle-checkbox").forEach((checkbox) => {
       checkbox.addEventListener("change", async (e) => {
         const todoId = e.target.closest(".todo-item").dataset.id;
-        console.log("checkbox event:", todoId);
 
         try {
           const updatedTodo = await this.todoService.toggleTodo(todoId);
-          console.log("updated todo:", updatedTodo);
           // 상태 변경, 화면 갱신
           await this.refreshTodos();
         } catch (error) {
@@ -240,21 +236,14 @@ class TodoList {
   }
 
   async editTodo(todoId) {
-    console.log("받은 todoId:", todoId, typeof todoId);
-    console.log("현재 todos:", this.todos);
     const todo = this.todos.find((todo) => todo.id === Number(todoId));
-    console.log("찾은 todo:", todo);
-    console.log(
-      "현재 todos 상세:",
-      this.todos.map((todo) => ({ id: todo.id, type: typeof todo.id }))
-    );
+
     if (todo) {
       // 1.먼저 editMode 설정
       this.todoService.setEditMode(todo);
       // 2.라우팅
       if (window.router) {
         window.router.navigate("/edit");
-        console.log("라우팅 완료"); // 라우팅 완료 확인
       }
       // 3.이벤트 발생
       setTimeout(() => {
@@ -263,10 +252,8 @@ class TodoList {
           bubbles: true,
         });
         document.dispatchEvent(editEvent);
-        console.log("editTodoRequested 이벤트 발생 완료"); // 이벤트 발생 확인
       }, 0);
     }
-    console.log("todolist 렌더링");
   }
 }
 

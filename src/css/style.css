@@ -58,16 +58,28 @@ h3 {
   cursor: pointer;
   transition: all 0.3s ease;
   height: 32px;
-  overflow: hidden;
 }
 
 .buttons.hidden {
-  opacity: 0.5;
   transform: translateY(-100%);
+  opacity: 0;
   height: 0;
   margin: 0;
   pointer-events: none;
   visibility: hidden;
+}
+
+.buttons.hidden .filter-dropdown {
+  visibility: visible;
+  transform: none;
+  height: auto;
+  pointer-events: auto;
+  opacity: 1;
+  display: none;
+}
+
+.filter-dropdown:not(.hidden) {
+  z-index: 1000;
 }
 
 .buttons :hover {

@@ -13,6 +13,10 @@ export const calculateDday = (targetDate) => {
   const diffTime = today - ddayDate;
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
+  if (!targetDate) {
+    return { text: "", cssClass: "" };
+  }
+
   // CSS class 결정
   let cssClass = "";
   if (diffDays > 0) {

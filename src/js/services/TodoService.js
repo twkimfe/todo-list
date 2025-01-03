@@ -153,7 +153,6 @@ class TodoService {
       const index = this._findTodoIndex(id);
       if (index !== -1) {
         const todo = this.todos[index];
-        console.log("preStatus:", todo.status);
 
         // checkbox 토글에 따라 상태 변경
         if (todo.status === "completed") {
@@ -161,12 +160,10 @@ class TodoService {
           todo.status = todo.previousStatus || "pending";
           todo.previousStatus = null;
           // 이전 상태 초기화
-          console.log("untoggle", todo.status);
         } else {
           // 현 상태를 previousStatus에 저장하고 completed로 변경
           todo.previousStatus = todo.status;
           todo.status = "completed";
-          console.log("toggle", todo.status);
         }
         await this.saveToLocalStorage();
         return todo;
