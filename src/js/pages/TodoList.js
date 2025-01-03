@@ -179,17 +179,29 @@ class TodoList {
     this.container.querySelectorAll(".toggle-checkbox").forEach((checkbox) => {
       checkbox.addEventListener("change", async (e) => {
         const todoId = e.target.closest(".todo-item").dataset.id;
-        const todo = this.todos.find((todo) => todo.id === todoId);
+        console.log("checkbox event:", todoId);
 
-        if (todo) {
-          try {
-            await this.todoService.toggleTodo(todoId);
-            // 전체 목록을 다시 불러서 최신 상태 유지
-            this.todos = await this.todoService.getTodos();
-            this.render();
-          } catch (error) {
-            console.error("상태 수정 실패:", error);
-          }
+        try {
+          const updatedTodo = await this.todoService.toggleTodo(todoId);
+          console.log("updated todo:", updatedTodo);
+          // 상태 변경, 화면 갱신
+          await this.refreshTodos();
+        } catch (error) {
+          console.error("상태 수정 실패:", error);
+        }
+      });
+    });
+
+    // todo-status 클릭 이벤트
+    this.container.querySelectorAll(".todo-status").forEach((statusElement) => {
+      statusElement.addEventListener("click", async (e) => {
+        const todoId = e.target.closest(".todo-item").dataset.id;
+        try {
+          await this.todoService.cycleTodoStatus(todoId);
+          this.todos = await this.todoService.getTodos();
+          this.render();
+        } catch (error) {
+          console.error("상태 변경 실패:", error);
         }
       });
     });
