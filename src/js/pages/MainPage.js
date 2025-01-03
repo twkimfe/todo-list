@@ -2,6 +2,7 @@
 import Page from "./Page.js";
 import TodoList from "./TodoList.js";
 import todoService from "../services/TodoService.js";
+import { updateButtonsHide } from "../utils/buttonHideUtils.js";
 
 class MainPage extends Page {
   constructor() {
@@ -21,13 +22,13 @@ class MainPage extends Page {
            <button class="addTodoBtn" aria-label="할 일 추가">+</button>
           <br>
         <div class ="buttons">
-             <button class="filter" aria-label="필터"><i class="fas fa-filter"></i></button>
-              <div class="filter-dropdown hidden">
+            <button class="filter" aria-label="필터"><i class="fas fa-filter"></i></button>
+            <div class="filter-dropdown hidden">
               <div class="filter-option" data-filter="lastest">최신순</div>
               <div class="filter-option" data-filter="incomplete">미완성</div>
               <div class="filter-option" data-filter="complete">완성</div>
-        </div>
-             <button class="allDelete" aria-label="전체 삭제"><i class="fas fa-trash"></i></button>
+           </div>
+            <button class="allDelete" aria-label="전체 삭제"><i class="fas fa-trash"></i></button>
         </div>
           <hr class="divider" />
           <ul id="todo-list"></ul>
@@ -127,6 +128,7 @@ class MainPage extends Page {
       if (result) {
         // 목록 성공 전체 삭제 시, 화면 새로고침
         this.todoList.refreshTodos();
+        updateButtonsHide(this.todoList.todos);
       }
     } catch (error) {
       console.error("삭제 실패 했습니다", error);

@@ -1,6 +1,8 @@
+// TodoList.js
 import todoService from "../services/TodoService.js";
 import { getStatusDisplay } from "../utils/statusUtils.js";
 import { calculateDday } from "../utils/ddayUtils.js";
+import { updateButtonsHide } from "../utils/buttonHideUtils.js";
 
 class TodoList {
   constructor() {
@@ -31,8 +33,10 @@ class TodoList {
   async refreshTodos() {
     try {
       this.todos = await this.todoService.getTodos();
-      console.log("가져온 todos:", this.todos);
+      console.log("[TodoList] 현재 todos 길이:", this.todos.length);
       this.render();
+
+      updateButtonsHide(this.todos);
     } catch (error) {
       console.error("data 새로고침 실패:", error);
     }
@@ -54,9 +58,7 @@ class TodoList {
     if (todoElement) {
       todoElement.remove();
     }
-    this.todos = this.todos.filter((todo) => todo.id !== todoId);
-
-    console.log("todo 삭제됨:", event.detail);
+    await this.deleteTodo(todoId);
   }
 
   async handleTodoUpdated(event) {
@@ -230,6 +232,7 @@ class TodoList {
         // 최신 목록 불러오기
         this.todos = await this.todoService.getTodos();
         this.render();
+        updateButtonsHide(this.todos);
       }
     } catch (error) {
       console.error("Todo 삭제 실패:", error);
